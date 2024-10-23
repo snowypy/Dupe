@@ -1,0 +1,7 @@
+name: DupeJS
+version: '1.0'
+main: codes.snowy.dupeJS.DupeJS
+api-version: '1.20'
+authors: [ snowyjs ]
+description: A filter with various implementations
+website: https://snowy.codes
