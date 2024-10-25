@@ -4,6 +4,7 @@ import co.aikar.commands.PaperCommandManager;
 import codes.snowy.dupeJS.dupe.DupeBlacklistCommand;
 import codes.snowy.dupeJS.dupe.DupeCommand;
 import codes.snowy.dupeJS.dupe.DupeManager;
+import codes.snowy.dupeJS.lifesteal.*;
 import codes.snowy.dupeJS.utils.Config;
 import codes.snowy.dupeJS.utils.Logger;
 import org.bukkit.Bukkit;
@@ -15,6 +16,7 @@ import java.io.File;
 public final class DupeJS extends JavaPlugin {
 
     DupeManager dupeManager;
+    LifestealManager lifestealmanager;
     private Config config;
     private static DupeJS instance;
 
@@ -30,11 +32,23 @@ public final class DupeJS extends JavaPlugin {
 
         loadConfig();
         dupeManager = new DupeManager();
+        lifestealmanager = new LifestealManager();
         PaperCommandManager manager = new PaperCommandManager(this);
+        manager.enableUnstableAPI("help");
         manager.registerCommand(new DupeCommand(dupeManager));
-        Logger.INSTANCE.log("Loaded the Dupe Command", "SUCCESS");
+        Logger.INSTANCE.log("Loaded the Dupe Command", "success");
         manager.registerCommand(new DupeBlacklistCommand(dupeManager));
-        Logger.INSTANCE.log("Loaded the DupeBlacklist Command", "SUCCESS");
+        Logger.INSTANCE.log("Loaded the DupeBlacklist Command", "success");
+        manager.registerCommand(new LSAdminCommand(lifestealmanager));
+        Logger.INSTANCE.log("Loaded the Lifesteal Admin Command", "success");
+        manager.registerCommand(new PayHeartsCommand(lifestealmanager));
+        Logger.INSTANCE.log("Loaded the PayHearts Command", "success");
+        manager.registerCommand(new WithdrawCommand(lifestealmanager));
+        Logger.INSTANCE.log("Loaded the Withdraw Command", "success");
+
+        getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager), this);
+        Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
+
 
     }
 
@@ -45,7 +59,7 @@ public final class DupeJS extends JavaPlugin {
 
     private void loadConfig() {
         try {
-            Logger.INSTANCE.log("Loading the configuration file", "INFO");
+            Logger.INSTANCE.log("Loading the configuration file", "info");
             File configFiles = new File(getDataFolder(), "configuration.yml");
             if (!configFiles.exists()) {
                 saveResource("configuration.yml", false);
@@ -59,6 +73,6 @@ public final class DupeJS extends JavaPlugin {
         }
 
         this.config = new Config(this);
-        Logger.INSTANCE.log("The configuration has been loaded", "SUCCESS");
+        Logger.INSTANCE.log("The configuration has been loaded", "success");
     }
 }
