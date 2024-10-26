@@ -42,8 +42,8 @@ public class LifestealManager {
             return false;
         }
 
-        removeHearts(sender, amount);
-        addHearts(recipient, amount);
+        removeHearts(sender, (amount * 2));
+        addHearts(recipient, (amount * 2));
         return true;
     }
 }
