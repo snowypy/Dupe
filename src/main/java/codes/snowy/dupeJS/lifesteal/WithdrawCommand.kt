@@ -7,26 +7,27 @@ import co.aikar.commands.annotation.Optional
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.ItemMeta
 
 @CommandAlias("withdraw")
 class WithdrawCommand(private val manager: LifestealManager) : BaseCommand() {
 
     @Default
     fun onWithdraw(player: Player, @Optional amount: Int?) {
-        val heartsToWithdraw = amount ?: 2
-        val heartsToWithdrawPhyc = amount ?: 1
-        if (manager.getHearts(player) <= heartsToWithdraw) {
+        val heartsToWithdraw = amount ?: 1
+        val healthToWithdraw = heartsToWithdraw * 2
+
+        if (manager.getHearts(player) < healthToWithdraw) {
             player.sendMessage("Not enough hearts to withdraw.")
             return
         }
-        manager.removeHearts(player, heartsToWithdraw)
 
-        val heartItem = ItemStack(Material.RED_DYE, heartsToWithdrawPhyc).apply {
+        manager.removeHearts(player, healthToWithdraw)
+
+        val heartItem = ItemStack(Material.RED_DYE, heartsToWithdraw).apply {
             itemMeta = itemMeta?.apply { setDisplayName("§cHeart") }
         }
 
         player.inventory.addItem(heartItem)
-        player.sendMessage("You have withdrawn $heartsToWithdrawPhyc heart(s).")
+        player.sendMessage("You have withdrawn $heartsToWithdraw heart(s).")
     }
 }
