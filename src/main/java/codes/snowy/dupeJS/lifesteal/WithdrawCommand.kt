@@ -17,6 +17,11 @@ class WithdrawCommand(private val manager: LifestealManager) : BaseCommand() {
         val heartsToWithdraw = amount ?: 1
         val healthToWithdraw = heartsToWithdraw * 2
 
+        if (healthToWithdraw < 2) {
+            player.sendMessage("&#f6294b&lLIFESTEAL &8| &cYou must withdraw at least 1 heart.".translate())
+            return
+        }
+
         if ((manager.getHearts(player) - 2) < healthToWithdraw) {
             player.sendMessage("&#f6294b&lLIFESTEAL &8| &cNot enough hearts to withdraw.".translate())
             return
