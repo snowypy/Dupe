@@ -2,12 +2,15 @@ package codes.snowy.dupeJS.lifesteal;
 
 import codes.snowy.dupeJS.utils.Logger;
 import codes.snowy.dupeJS.utils.TranslationKt;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class LifestealListener implements Listener {
     private final LifestealManager manager;
@@ -39,17 +42,27 @@ public class LifestealListener implements Listener {
 
     @EventHandler
     public void onHeartClaim(PlayerInteractEvent event) {
+        ItemStack heartItem = new ItemStack(Material.RED_DYE);
+        ItemMeta meta = heartItem.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName("§cHeart");
+            heartItem.setItemMeta(meta);
+        }
         Player player = event.getPlayer();
+
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (manager.getHearts(player) >= 50) {
-                player.sendMessage(TranslationKt.translate("&cYou have reached the maximum amount of hearts"));
-                return;
+            if (player.getItemInUse() == heartItem) {
+                if (manager.getHearts(player) >= 50) {
+                    player.sendMessage(TranslationKt.translate("&cYou have reached the maximum amount of hearts"));
+                    return;
+                }
+                if (manager.addHearts(player, 2)) {
+                    player.sendMessage(TranslationKt.translate("&cYou have claimed a heart"));
+                    event.setCancelled(true);
+                    event.getItem().setAmount(event.getItem().getAmount() - 1);
+                }
             }
-            if (manager.addHearts(player, 2)) {
-                player.sendMessage(TranslationKt.translate("&cYou have claimed a heart"));
-                event.setCancelled(true);
-                event.getItem().setAmount(event.getItem().getAmount() - 1);
-            }
+
         }
     }
 }
