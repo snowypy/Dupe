@@ -22,9 +22,9 @@ public class LifestealManager {
         return newHearts != currentHearts;
     }
 
-    public boolean removeHearts(Player player, int amount) {
+    public boolean removeHearts(Player player, int healthAmount) {
         int currentHearts = getHearts(player);
-        int newHearts = Math.max(currentHearts - amount, 1);
+        int newHearts = Math.max(currentHearts - healthAmount, 2);
         playerHearts.put(player.getUniqueId(), newHearts);
         player.setMaxHealth(newHearts);
         return newHearts != currentHearts;
