@@ -4,6 +4,7 @@ import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.Default
 import co.aikar.commands.annotation.Optional
+import codes.snowy.dupeJS.utils.translate
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -16,8 +17,8 @@ class WithdrawCommand(private val manager: LifestealManager) : BaseCommand() {
         val heartsToWithdraw = amount ?: 1
         val healthToWithdraw = heartsToWithdraw * 2
 
-        if (manager.getHearts(player) < healthToWithdraw) {
-            player.sendMessage("Not enough hearts to withdraw.")
+        if ((manager.getHearts(player) - 2) < healthToWithdraw) {
+            player.sendMessage("&#f6294b&lLIFESTEAL &8| &cNot enough hearts to withdraw.".translate())
             return
         }
 
@@ -28,6 +29,6 @@ class WithdrawCommand(private val manager: LifestealManager) : BaseCommand() {
         }
 
         player.inventory.addItem(heartItem)
-        player.sendMessage("You have withdrawn $heartsToWithdraw heart(s).")
+        player.sendMessage("&#f6294b&lLIFESTEAL &8| &aYou have withdrawn $heartsToWithdraw heart(s).".translate())
     }
 }
