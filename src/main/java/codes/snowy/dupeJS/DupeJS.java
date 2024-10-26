@@ -1,6 +1,9 @@
 package codes.snowy.dupeJS;
 
 import co.aikar.commands.PaperCommandManager;
+import codes.snowy.dupeJS.crushplus.CrushPlusManager;
+import codes.snowy.dupeJS.crushplus.FlightCommand;
+import codes.snowy.dupeJS.crushplus.FlightRestrictionListener;
 import codes.snowy.dupeJS.dupe.DupeBlacklistCommand;
 import codes.snowy.dupeJS.dupe.DupeCommand;
 import codes.snowy.dupeJS.dupe.DupeManager;
@@ -17,6 +20,7 @@ public final class DupeJS extends JavaPlugin {
 
     DupeManager dupeManager;
     LifestealManager lifestealmanager;
+    CrushPlusManager crushPlusManager;
     private Config config;
     private static DupeJS instance;
 
@@ -33,6 +37,7 @@ public final class DupeJS extends JavaPlugin {
         loadConfig();
         dupeManager = new DupeManager();
         lifestealmanager = new LifestealManager();
+        crushPlusManager = new CrushPlusManager(this);
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("help");
         manager.registerCommand(new DupeCommand(dupeManager));
@@ -45,9 +50,14 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the PayHearts Command", "success");
         manager.registerCommand(new WithdrawCommand(lifestealmanager));
         Logger.INSTANCE.log("Loaded the Withdraw Command", "success");
+        manager.registerCommand(new FlightCommand(crushPlusManager));
+        Logger.INSTANCE.log("Loaded the Flight Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
+
+        getServer().getPluginManager().registerEvents(new FlightRestrictionListener(crushPlusManager), this);
+        Logger.INSTANCE.log("Loaded the Flight Restriction Listener", "success");
 
 
     }
