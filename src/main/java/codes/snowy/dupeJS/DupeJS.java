@@ -53,7 +53,7 @@ public final class DupeJS extends JavaPlugin {
         manager.registerCommand(new FlightCommand(crushPlusManager));
         Logger.INSTANCE.log("Loaded the Flight Command", "success");
 
-        getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager), this);
+        getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
 
         getServer().getPluginManager().registerEvents(new FlightRestrictionListener(crushPlusManager), this);
