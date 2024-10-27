@@ -66,7 +66,7 @@ class DupeManager {
         player.sendMessage("&#7723ea&lDUPE &8| &#98f81dYou have blacklisted this item.".translate())
     }
 
-    private fun nbtCheck(stack: ItemStack): Boolean {
+    fun nbtCheck(stack: ItemStack): Boolean {
 
         val nbtItem = NBT.itemStackToNBT(stack)
 
