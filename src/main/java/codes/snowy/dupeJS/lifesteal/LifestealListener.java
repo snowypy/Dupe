@@ -1,5 +1,6 @@
 package codes.snowy.dupeJS.lifesteal;
 
+import codes.snowy.dupeJS.dupe.DupeManager;
 import codes.snowy.dupeJS.utils.Logger;
 import codes.snowy.dupeJS.utils.TranslationKt;
 import org.bukkit.Material;
@@ -14,9 +15,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 public class LifestealListener implements Listener {
     private final LifestealManager manager;
+    private final DupeManager dupeManager;
 
-    public LifestealListener(LifestealManager manager) {
+    public LifestealListener(LifestealManager manager, DupeManager dupeManager) {
         this.manager = manager;
+        this.dupeManager = dupeManager;
     }
 
     @EventHandler
@@ -55,6 +58,11 @@ public class LifestealListener implements Listener {
         ItemMeta itemMeta = itemInHand.getItemMeta();
         if (itemMeta == null || !itemMeta.hasDisplayName() ||
                 !itemMeta.getDisplayName().equals("§cHeart")) {
+            return;
+        }
+
+        if (!dupeManager.nbtCheck(itemInHand)) {
+            player.sendMessage(TranslationKt.translate("&#f6294b&lLIFESTEAL &8| &cThis item is not allowed to be used as a heart. Sorry!"));
             return;
         }
 
