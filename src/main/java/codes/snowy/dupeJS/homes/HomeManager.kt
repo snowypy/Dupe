@@ -9,7 +9,7 @@ import org.bukkit.Bukkit
 
 class HomeManager {
 
-    private val dbConnection: Connection = DriverManager.getConnection("jdbc:sqlite:Hardcore-Databases/homes.db")
+    private val dbConnection: Connection = DriverManager.getConnection("jdbc:sqlite:Databases/homes.db")
 
     init {
         dbConnection.createStatement().executeUpdate(
