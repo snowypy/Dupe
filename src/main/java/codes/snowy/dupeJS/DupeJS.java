@@ -7,7 +7,11 @@ import codes.snowy.dupeJS.crushplus.FlightRestrictionListener;
 import codes.snowy.dupeJS.dupe.DupeBlacklistCommand;
 import codes.snowy.dupeJS.dupe.DupeCommand;
 import codes.snowy.dupeJS.dupe.DupeManager;
+import codes.snowy.dupeJS.homes.HomeCommand;
+import codes.snowy.dupeJS.homes.HomeListener;
+import codes.snowy.dupeJS.homes.HomeManager;
 import codes.snowy.dupeJS.lifesteal.*;
+import codes.snowy.dupeJS.teleporter.TeleportManager;
 import codes.snowy.dupeJS.utils.Config;
 import codes.snowy.dupeJS.utils.Logger;
 import org.bukkit.Bukkit;
@@ -21,6 +25,8 @@ public final class DupeJS extends JavaPlugin {
     DupeManager dupeManager;
     LifestealManager lifestealmanager;
     CrushPlusManager crushPlusManager;
+    HomeManager homeManager;
+    TeleportManager teleportManager;
     private Config config;
     private static DupeJS instance;
 
@@ -35,6 +41,8 @@ public final class DupeJS extends JavaPlugin {
         DupeJS.instance = this;
 
         loadConfig();
+        homeManager = new HomeManager();
+        teleportManager = new TeleportManager(this);
         dupeManager = new DupeManager();
         lifestealmanager = new LifestealManager();
         crushPlusManager = new CrushPlusManager(this);
@@ -52,12 +60,18 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Withdraw Command", "success");
         manager.registerCommand(new FlightCommand(crushPlusManager));
         Logger.INSTANCE.log("Loaded the Flight Command", "success");
+        manager.registerCommand(new HomeCommand(homeManager, teleportManager, manager));
+        Logger.INSTANCE.log("Loaded the Home Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
 
         getServer().getPluginManager().registerEvents(new FlightRestrictionListener(crushPlusManager), this);
         Logger.INSTANCE.log("Loaded the Flight Restriction Listener", "success");
+
+        getServer().getPluginManager().registerEvents(new HomeListener(homeManager, teleportManager), this);
+        Logger.INSTANCE.log("Loaded the Home Listener", "success");
+
 
 
     }
