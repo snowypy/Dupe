@@ -1,6 +1,10 @@
 package codes.snowy.dupeJS;
 
 import co.aikar.commands.PaperCommandManager;
+import codes.snowy.dupeJS.bundles.AdminBundleCommand;
+import codes.snowy.dupeJS.bundles.BundleListener;
+import codes.snowy.dupeJS.bundles.BundleManager;
+import codes.snowy.dupeJS.bundles.PreviewBundleCommand;
 import codes.snowy.dupeJS.crushplus.CrushPlusManager;
 import codes.snowy.dupeJS.crushplus.FlightCommand;
 import codes.snowy.dupeJS.crushplus.FlightRestrictionListener;
@@ -27,6 +31,7 @@ public final class DupeJS extends JavaPlugin {
     CrushPlusManager crushPlusManager;
     HomeManager homeManager;
     TeleportManager teleportManager;
+    BundleManager bundleManager;
     private Config config;
     private static DupeJS instance;
 
@@ -62,6 +67,10 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Flight Command", "success");
         manager.registerCommand(new HomeCommand(homeManager, teleportManager, manager));
         Logger.INSTANCE.log("Loaded the Home Command", "success");
+        manager.registerCommand(new AdminBundleCommand());
+        Logger.INSTANCE.log("Loaded the AdminBundle Command", "success");
+        manager.registerCommand(new PreviewBundleCommand());
+        Logger.INSTANCE.log("Loaded the PreviewBundle Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
@@ -71,6 +80,9 @@ public final class DupeJS extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new HomeListener(homeManager, teleportManager), this);
         Logger.INSTANCE.log("Loaded the Home Listener", "success");
+
+
+        getServer().getPluginManager().registerEvents(new BundleListener(), this);
 
 
 
