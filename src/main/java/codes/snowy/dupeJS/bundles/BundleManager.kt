@@ -3,7 +3,6 @@ package codes.snowy.dupeJS.bundles
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.inventory.ItemStack
 import java.io.File
-import java.util.*
 
 data class Bundle(val name: String, val items: List<ItemStack>)
 
@@ -19,14 +18,18 @@ object BundleManager {
     private fun loadAllBundles() {
         dataFolder.listFiles()?.forEach { file ->
             if (file.extension == "yml") {
-                val yamlConfig = YamlConfiguration.loadConfiguration(file)
-                val bundleName = yamlConfig.getString("name") ?: return@forEach
-                val itemList = yamlConfig.getList("items")?.mapNotNull { item ->
-                    if (item is ItemStack) item else null
-                } ?: emptyList()
-                bundles[bundleName.lowercase()] = Bundle(bundleName, itemList)
+                loadBundle(file)
             }
         }
+    }
+
+    private fun loadBundle(file: File) {
+        val yamlConfig = YamlConfiguration.loadConfiguration(file)
+        val bundleName = yamlConfig.getString("name") ?: return
+        val itemList = yamlConfig.getList("items")?.mapNotNull { item ->
+            if (item is ItemStack) item else null
+        } ?: emptyList()
+        bundles[bundleName.lowercase()] = Bundle(bundleName, itemList)
     }
 
     fun getBundle(name: String): Bundle? {
@@ -41,6 +44,8 @@ object BundleManager {
         yamlConfig.set("items", bundle.items)
 
         yamlConfig.save(file)
+
+        loadBundle(file)
     }
 
     fun getAllBundleNames(): List<String> {
