@@ -1,13 +1,27 @@
 package codes.snowy.dupeJS.bundles
 
 import codes.snowy.dupeJS.DupeJS
+import codes.snowy.dupeJS.utils.translate
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 
 object BundleGUI {
-    fun openBundleGUI(player: Player, bundle: Bundle) {
-        val inventory = Bukkit.createInventory(null, 27, "Opening ${bundle.name}")
+
+    fun openBundlePreview(player: Player, bundle: Bundle) {
+        val inventory = Bukkit.createInventory(null, 27, "${bundle.color}Preview: ${bundle.displayName} ${bundle.color}Bundle!".translate())
+
+        bundle.items.forEachIndexed { index, item ->
+            inventory.setItem(index, item)
+        }
+
+        player.openInventory(inventory)
+    }
+
+    fun openBundleAnimation(player: Player, bundle: Bundle) {
+        val inventory = Bukkit.createInventory(null, 27, "${bundle.color}Opening: ${bundle.displayName} ${bundle.color}Bundle!".translate())
+
+        player.openInventory(inventory)
 
         object : BukkitRunnable() {
             var ticks = 0
@@ -26,18 +40,5 @@ object BundleGUI {
                 }
             }
         }.runTaskTimer(DupeJS.getInstance(), 0L, 5L)
-
-        player.openInventory(inventory)
     }
-
-    fun openBundlePreview(player: Player, bundle: Bundle) {
-        val inventory = Bukkit.createInventory(null, 27, "Preview: ${bundle.name}")
-
-        bundle.items.forEachIndexed { index, item ->
-            inventory.setItem(index, item)
-        }
-
-        player.openInventory(inventory)
-    }
-
 }
