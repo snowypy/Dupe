@@ -1,10 +1,9 @@
 package codes.snowy.dupeJS.bundles
 
+import codes.snowy.dupeJS.bundles.Bundle
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.inventory.ItemStack
 import java.io.File
-
-data class Bundle(val name: String, val items: List<ItemStack>)
 
 object BundleManager {
     private val bundles = mutableMapOf<String, Bundle>()
@@ -26,10 +25,13 @@ object BundleManager {
     private fun loadBundle(file: File) {
         val yamlConfig = YamlConfiguration.loadConfiguration(file)
         val bundleName = yamlConfig.getString("name") ?: return
+        val color = yamlConfig.getString("color") ?: "WHITE"
+        val displayName = yamlConfig.getString("displayName") ?: bundleName
         val itemList = yamlConfig.getList("items")?.mapNotNull { item ->
             if (item is ItemStack) item else null
         } ?: emptyList()
-        bundles[bundleName.lowercase()] = Bundle(bundleName, itemList)
+
+        bundles[bundleName.lowercase()] = Bundle(bundleName, color, displayName, itemList)
     }
 
     fun getBundle(name: String): Bundle? {
@@ -41,6 +43,8 @@ object BundleManager {
         val yamlConfig = YamlConfiguration()
 
         yamlConfig.set("name", bundle.name)
+        yamlConfig.set("color", bundle.color)
+        yamlConfig.set("displayName", bundle.displayName)
         yamlConfig.set("items", bundle.items)
 
         yamlConfig.save(file)
