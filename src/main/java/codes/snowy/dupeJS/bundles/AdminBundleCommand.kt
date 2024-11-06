@@ -2,6 +2,7 @@ package codes.snowy.dupeJS.bundles
 
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
+import codes.snowy.dupeJS.utils.translate
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -12,11 +13,11 @@ import org.bukkit.inventory.ItemStack
 class AdminBundleCommand : BaseCommand() {
 
     @Subcommand("create")
-    @CommandCompletion("@nothing")
-    fun onCreate(sender: Player, @Single name: String) {
-        val bundle = Bundle(name, sender.inventory.filterNotNull().toList())
+    @CommandCompletion("@nothing @colors @displayNames")
+    fun onCreate(sender: Player, @Single name: String, color: String, @Single displayName: String) {
+        val bundle = Bundle(name, color, displayName, sender.inventory.filterNotNull().toList())
         BundleManager.saveBundle(bundle)
-        sender.sendMessage("Bundle ${name} created!")
+        sender.sendMessage("Bundle $displayName created with color $color!")
     }
 
     @Subcommand("give")
@@ -29,10 +30,11 @@ class AdminBundleCommand : BaseCommand() {
 
         val bundleItem = ItemStack(Material.BARREL).apply {
             itemMeta = itemMeta?.apply {
-                setDisplayName(bundle.name)
+                setDisplayName("${bundle.color}${bundle.displayName}&r &fBundle".translate())
             }
         }
         target.inventory.addItem(bundleItem)
-        sender.sendMessage("Gave ${bundle.name} to ${target.name}.")
+        sender.sendMessage("Gave ${bundle.displayName} to ${target.name}.")
     }
 }
+
