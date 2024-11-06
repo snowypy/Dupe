@@ -1,6 +1,7 @@
 package codes.snowy.dupeJS;
 
 import co.aikar.commands.PaperCommandManager;
+import codes.snowy.dupeJS.utils.CommandCompletions;
 import codes.snowy.dupeJS.bundles.AdminBundleCommand;
 import codes.snowy.dupeJS.bundles.BundleListener;
 import codes.snowy.dupeJS.bundles.BundleManager;
@@ -53,6 +54,8 @@ public final class DupeJS extends JavaPlugin {
         crushPlusManager = new CrushPlusManager(this);
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("help");
+
+        CommandCompletions.INSTANCE.register(manager);
         manager.registerCommand(new DupeCommand(dupeManager));
         Logger.INSTANCE.log("Loaded the Dupe Command", "success");
         manager.registerCommand(new DupeBlacklistCommand(dupeManager));
