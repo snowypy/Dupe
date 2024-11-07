@@ -2,8 +2,10 @@ package codes.snowy.dupeJS.bundles
 
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
+import codes.snowy.dupeJS.utils.Config
 import codes.snowy.dupeJS.utils.applyRainbowText
 import codes.snowy.dupeJS.utils.translate
+import de.tr7zw.changeme.nbtapi.NBTItem
 import formatMaterial
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -12,21 +14,21 @@ import org.bukkit.inventory.ItemStack
 
 @CommandAlias("adminbundle")
 @CommandPermission("admin.bundle")
-class AdminBundleCommand : BaseCommand() {
+class AdminBundleCommand(private val config: Config) : BaseCommand() {
 
     @Subcommand("create")
     @CommandCompletion("@nothing @colors @displayNames")
     fun onCreate(sender: Player, @Single name: String, color: String, @Single displayName: String) {
         val bundle = Bundle(name, color, displayName, sender.inventory.filterNotNull().toList())
         BundleManager.saveBundle(bundle)
-        sender.sendMessage("Bundle $displayName created with color $color!")
+        sender.sendMessage("&#FAAAAA&lBUNDLES &8| &aCreated the $color&n$displayName&f Bundle".translate())
     }
 
     @Subcommand("give")
     @CommandCompletion("@players @bundles")
     fun onGive(sender: Player, @Flags("other") target: Player, @Single bundleName: String) {
         val bundle = BundleManager.getBundle(bundleName) ?: run {
-            sender.sendMessage("Bundle not found.")
+            sender.sendMessage("&#FAAAAA&lBUNDLES &8| &#FF0000Bundle not found.")
             return
         }
 
@@ -53,9 +55,11 @@ class AdminBundleCommand : BaseCommand() {
                 setLore(lore)
             }
         }
+        val nbtItem = NBTItem(bundleItem)
+        nbtItem.setInteger("custom_model_data", config.getInt("dupe.modeldata", 1111))
 
-        target.inventory.addItem(bundleItem)
-        sender.sendMessage("Gave ${bundle.displayName} to ${target.name}.")
+        target.inventory.addItem(nbtItem.item)
+        sender.sendMessage("&#FAAAAA&lBUNDLES &8| &aGave ${bundle.color}$&n{bundle.displayName}&a to ${target.name}.".translate())
     }
 
 }
