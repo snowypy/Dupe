@@ -70,7 +70,7 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Flight Command", "success");
         manager.registerCommand(new HomeCommand(homeManager, teleportManager, manager));
         Logger.INSTANCE.log("Loaded the Home Command", "success");
-        manager.registerCommand(new AdminBundleCommand());
+        manager.registerCommand(new AdminBundleCommand(config));
         Logger.INSTANCE.log("Loaded the AdminBundle Command", "success");
         manager.registerCommand(new PreviewBundleCommand());
         Logger.INSTANCE.log("Loaded the PreviewBundle Command", "success");
@@ -85,7 +85,7 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Home Listener", "success");
 
 
-        getServer().getPluginManager().registerEvents(new BundleListener(), this);
+        getServer().getPluginManager().registerEvents(new BundleListener(dupeManager), this);
 
 
 
