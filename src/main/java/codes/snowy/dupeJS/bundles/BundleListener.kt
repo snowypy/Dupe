@@ -4,14 +4,18 @@ import codes.snowy.dupeJS.bundles.BundleGUI
 import codes.snowy.dupeJS.bundles.BundleInventoryHolder
 import codes.snowy.dupeJS.bundles.BundleManager
 import org.bukkit.ChatColor
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.scheduler.BukkitRunnable
 
 class BundleListener : Listener {
+
+    private val ongoingAnimations = mutableMapOf<Player, BukkitRunnable>()
 
     @EventHandler
     fun onBundleOpen(event: PlayerInteractEvent) {
@@ -55,10 +59,32 @@ class BundleListener : Listener {
 
     @EventHandler
     fun onInventoryClose(event: InventoryCloseEvent) {
-        val inventory = event.inventory
+        val player = event.player as? Player ?: return
+        val inventoryHolder = event.inventory.holder as? BundleInventoryHolder ?: return
 
-        if (inventory.holder is BundleInventoryHolder) {
-            val bundleHolder = inventory.holder as BundleInventoryHolder
+        if (inventoryHolder.type == "opening") {
+            ongoingAnimations[player]?.let { task ->
+                task.cancel()
+                ongoingAnimations.remove(player)
+
+                val bundle = inventoryHolder.bundle
+                if (BundleGUI.removeBundleItem(player, bundle)) {
+                    val selectedItem = bundle.items.random()
+                    player.inventory.addItem(selectedItem)
+                }
+            }
         }
     }
+
+    @EventHandler
+    fun onPlayerBundleClickDuringOpening(event: InventoryClickEvent) {
+        val player = event.whoClicked as? Player ?: return
+        val inventory = event.clickedInventory ?: return
+        val inventoryHolder = inventory.holder as? BundleInventoryHolder ?: return
+
+        if (ongoingAnimations.contains(player)) {
+            event.isCancelled = true
+        }
+    }
+
 }
