@@ -3,6 +3,9 @@ package codes.snowy.dupeJS.bundles
 import codes.snowy.dupeJS.bundles.BundleGUI
 import codes.snowy.dupeJS.bundles.BundleInventoryHolder
 import codes.snowy.dupeJS.bundles.BundleManager
+import codes.snowy.dupeJS.dupe.DupeManager
+import codes.snowy.dupeJS.utils.translate
+import de.tr7zw.changeme.nbtapi.NBTItem
 import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -13,7 +16,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.scheduler.BukkitRunnable
 
-class BundleListener : Listener {
+class BundleListener(private val dupeManager: DupeManager) : Listener {
 
     private val ongoingAnimations = mutableMapOf<Player, BukkitRunnable>()
 
@@ -26,6 +29,12 @@ class BundleListener : Listener {
 
         val bundle = BundleManager.getBundle(bundleStripped)
         if (bundle != null) {
+
+            if (!dupeManager.nbtCheck(item)) {
+                player.sendMessage("&#FF0000&lBLOCKED &8| &cThis item cannot be confirmed to be a bundle.".translate())
+                player.sendMessage("&#FF0000&lBLOCKED &8| &cPlease contact an admin if you believe this is a mistake.".translate())
+                return
+            }
 
             event.isCancelled = true
 
