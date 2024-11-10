@@ -23,6 +23,10 @@ repositories {
         name = "CodeMC"
         url = uri("https://repo.codemc.io/repository/maven-public/")
     }
+    maven {
+        url = "https://repo.extendedclip.com/content/repositories/placeholderapi/"
+        name = "placeholderapi"
+    }
 }
 
 dependencies {
@@ -35,6 +39,8 @@ dependencies {
     implementation 'org.yaml:snakeyaml:2.3'
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compileOnly ("net.luckperms:api:5.4")
+    compileOnly("me.clip:placeholderapi:2.11.5")
 }
 
 def targetJavaVersion = 17
