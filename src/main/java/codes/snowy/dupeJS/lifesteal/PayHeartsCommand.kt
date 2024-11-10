@@ -1,16 +1,20 @@
 package codes.snowy.dupeJS.lifesteal
 
 import co.aikar.commands.BaseCommand
-import co.aikar.commands.annotation.CommandAlias
-import co.aikar.commands.annotation.CommandCompletion
-import co.aikar.commands.annotation.Subcommand
-import co.aikar.commands.annotation.Optional
+import co.aikar.commands.annotation.*
 import codes.snowy.dupeJS.utils.translate
 import org.bukkit.Bukkit
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 @CommandAlias("hearts")
 class PayHeartsCommand(private val manager: LifestealManager) : BaseCommand() {
+
+    @HelpCommand
+    @Syntax("[query]")
+    fun help(sender: CommandSender, help: co.aikar.commands.CommandHelp) {
+        help.showHelp()
+    }
 
     @Subcommand("pay")
     @CommandAlias("payhearts")
