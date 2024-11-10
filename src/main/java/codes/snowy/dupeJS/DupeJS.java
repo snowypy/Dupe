@@ -1,6 +1,12 @@
 package codes.snowy.dupeJS;
 
 import co.aikar.commands.PaperCommandManager;
+import codes.snowy.dupeJS.session.SessionListener;
+import codes.snowy.dupeJS.staff.chat.StaffChatCommand;
+import codes.snowy.dupeJS.staff.chat.StaffChatListener;
+import codes.snowy.dupeJS.staff.chat.StaffChatManager;
+import codes.snowy.dupeJS.staff.vanish.VanishListener;
+import codes.snowy.dupeJS.staff.vanish.VanishManager;
 import codes.snowy.dupeJS.utils.CommandCompletions;
 import codes.snowy.dupeJS.bundles.AdminBundleCommand;
 import codes.snowy.dupeJS.bundles.BundleListener;
@@ -18,11 +24,11 @@ import codes.snowy.dupeJS.homes.HomeManager;
 import codes.snowy.dupeJS.lifesteal.*;
 import codes.snowy.dupeJS.teleporter.TeleportManager;
 import codes.snowy.dupeJS.utils.Config;
+import codes.snowy.dupeJS.utils.Language;
 import codes.snowy.dupeJS.utils.Logger;
+import codes.snowy.dupeJS.staff.vanish.VanishCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 
 public final class DupeJS extends JavaPlugin {
@@ -33,7 +39,10 @@ public final class DupeJS extends JavaPlugin {
     HomeManager homeManager;
     TeleportManager teleportManager;
     BundleManager bundleManager;
+    StaffChatManager staffChatManager;
+    VanishManager vanishManager;
     private Config config;
+    private Language language;
     private static DupeJS instance;
 
     public static DupeJS getInstance() {
@@ -52,6 +61,7 @@ public final class DupeJS extends JavaPlugin {
         dupeManager = new DupeManager();
         lifestealmanager = new LifestealManager();
         crushPlusManager = new CrushPlusManager(this);
+
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("help");
 
@@ -74,6 +84,10 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the AdminBundle Command", "success");
         manager.registerCommand(new PreviewBundleCommand());
         Logger.INSTANCE.log("Loaded the PreviewBundle Command", "success");
+        manager.registerCommand(new StaffChatCommand());
+        Logger.INSTANCE.log("Loaded the StaffChat Command", "success");
+        manager.registerCommand(new VanishCommand());
+        Logger.INSTANCE.log("Loaded the Vanish Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
@@ -84,8 +98,17 @@ public final class DupeJS extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new HomeListener(homeManager, teleportManager), this);
         Logger.INSTANCE.log("Loaded the Home Listener", "success");
 
+        getServer().getPluginManager().registerEvents(new SessionListener(), this);
+        Logger.INSTANCE.log("Loaded the Session Listener", "success");
 
         getServer().getPluginManager().registerEvents(new BundleListener(dupeManager), this);
+        Logger.INSTANCE.log("Loaded the Bundle Listener", "success");
+
+        getServer().getPluginManager().registerEvents(new StaffChatListener(), this);
+        Logger.INSTANCE.log("Loaded the StaffChat Listener", "success");
+
+        getServer().getPluginManager().registerEvents(new VanishListener(this), this);
+        Logger.INSTANCE.log("Loaded the Vanish Listener", "success");
 
 
 
@@ -113,5 +136,21 @@ public final class DupeJS extends JavaPlugin {
 
         this.config = new Config(this);
         Logger.INSTANCE.log("The configuration has been loaded", "success");
+
+        try {
+            Logger.INSTANCE.log("Loading plugin language file.", "info");
+            File configFiles = new File(getDataFolder(), "language.yml");
+            if (!configFiles.exists()) {
+                saveResource("language.yml", false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Logger.INSTANCE.log("Failed to load language file on start-up", "error");
+            Logger.INSTANCE.log("Auto disabling DupeJS... contact @snowyjs", "error");
+            Bukkit.getPluginManager().disablePlugin(this);
+        }
+
+        Language lang = new Language(this, config);
+
     }
 }
