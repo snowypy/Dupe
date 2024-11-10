@@ -1,0 +1,34 @@
+general:
+  no-permission: "&#FF0000&lERROR &8| &cYou don't have permission to execute that command."
+
+staff:
+  join: "&#47c3f2&lSTAFF &8• &#47c3f2%prefix%%player% &fhas joined &#47c3f2Development"
+  quit: "&a{PLAYER} has left the server"
+  vanish:
+    toggle-self: "&aYou are now in vanish"
+    untoggle-self: "&aYou are no longer in vanish"
+    bypass: "&cYou don't have bypass permissions."
+    gen-toggle-others: "&#47c3f2&lSTAFF &8• &#47c3f2%prefix%%player% &fis now &a%vanish-status%"
+    no-permission: "&#FF0000&lERROR &8| &cYou don't have permission to execute this command."
+    action-bar: "&aYou are in vanish. Other players cannot see you"
+    boss-bar: "&a&lVANISH &8• &fYou are in vanish"
+    placeholder:
+      tag:
+        true: "&7[V] "
+        false: ""
+      status:
+        true: "&aVanished"
+        false: "&cNot Vanished"
+      abovename: # Deprecated in recent TAB versions.
+        true: "&7[Vanished]"
+        false: ""
+      amount:
+        true: "&a%amount% players are vanished"
+        false: "&cNo players are vanished"
+  chat:
+    toggle:
+      true: "&#a4f247You have toggled staff chat."
+      false: "&#f25947You have disabled your staff chat toggle."
+    format: "&#47c3f2&lSTAFFCHAT &8• &#47c3f2%prefix%%player%&f: %message%"
+    no-permission: "&cYou do not have permission to use that command."
+    admin: "&7[ADMIN] &f{PLAYER}: {MESSAGE}"
