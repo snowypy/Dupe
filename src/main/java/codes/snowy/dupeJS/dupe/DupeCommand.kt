@@ -1,15 +1,18 @@
 package codes.snowy.dupeJS.dupe
 
 import co.aikar.commands.BaseCommand
-import co.aikar.commands.annotation.CommandAlias
-import co.aikar.commands.annotation.CommandCompletion
-import co.aikar.commands.annotation.Default
-import co.aikar.commands.annotation.Description
+import co.aikar.commands.annotation.*
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 @CommandAlias("dupe")
 class DupeCommand(val dupeManager: DupeManager) : BaseCommand() {
+
+    @HelpCommand
+    @Syntax("[query]")
+    fun help(sender: CommandSender, help: co.aikar.commands.CommandHelp) {
+        help.showHelp()
+    }
 
     @Default
     @CommandCompletion("1|2|3|4|5|6|7|8|9")
