@@ -1,3 +1,30 @@
 dupe:
   debug: false
   modeldata: 1111
+
+# Staff
+options:
+  staff:
+    staff-chat: true
+    admin-chat: true
+    join-messages: true
+    quit-messages: true
+  vanish:
+    toggle: true
+    action-bar: true
+    bossbar: true
+  filter:
+    enabled: true
+
+permissions:
+  staff:
+    staff-chat: "dupejs.staff.chat"
+    admin-chat: "dupejs.admin.chat"
+    join-messages: "dupejs.staff.joinmessages"
+    quit-messages: "dupejs.staff.quitmessages"
+  vanish:
+    toggle: "dupejs.staff.vanish.command"
+    use: "dupejs.staff.vanish.use"
+    action-bar: "dupejs.staff.vanish.actionbar"
+    notify-others: "dupejs.staff.vanish.notify"
+    bypass: "dupejs.staff.vanish.bypass"
