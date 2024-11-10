@@ -68,7 +68,7 @@ class AdminBundleCommand(private val config: Config) : BaseCommand() {
         nbtItem.setInteger("custom_model_data", config.getInt("dupe.modeldata", 1111))
 
         target.inventory.addItem(nbtItem.item)
-        sender.sendMessage("&#FAAAAA&lBUNDLES &8| &aGave ${bundle.color}$&n{bundle.displayName}&a to ${target.name}.".translate())
+        sender.sendMessage("&#FAAAAA&lBUNDLES &8| &aGave ${bundle.color}&n${bundle.displayName}&a to ${target.name}.".translate())
     }
 
 }
