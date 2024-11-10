@@ -1,20 +1,24 @@
 package codes.snowy.dupeJS.lifesteal
 
 import co.aikar.commands.BaseCommand
-import co.aikar.commands.annotation.CommandAlias
-import co.aikar.commands.annotation.Default
-import co.aikar.commands.annotation.Optional
+import co.aikar.commands.annotation.*
 import codes.snowy.dupeJS.DupeJS
 import codes.snowy.dupeJS.utils.Config
 import codes.snowy.dupeJS.utils.translate
 import de.tr7zw.changeme.nbtapi.NBTItem
 import org.bukkit.Material
+import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 @CommandAlias("withdraw")
 class WithdrawCommand(private val manager: LifestealManager) : BaseCommand() {
 
+    @HelpCommand
+    @Syntax("[query]")
+    fun help(sender: CommandSender, help: co.aikar.commands.CommandHelp) {
+        help.showHelp()
+    }
 
     private val config = Config(DupeJS.getInstance())
 
