@@ -1,6 +1,8 @@
 package codes.snowy.dupeJS.integration
 
 import codes.snowy.dupeJS.DupeJS
+import codes.snowy.dupeJS.dupe.DupeManager
+import codes.snowy.dupeJS.staff.chat.StaffChatManager
 import codes.snowy.dupeJS.staff.vanish.VanishManager
 import codes.snowy.dupeJS.utils.Config
 import codes.snowy.dupeJS.utils.Language
@@ -10,6 +12,7 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion
 
 class CoreExpansion(
     private val plugin: DupeJS,
+    private val dupeManager: DupeManager,
     private val language: Language,
     private val config: Config
 ) : PlaceholderExpansion() {
@@ -58,6 +61,17 @@ class CoreExpansion(
                 } else {
                     language.getReplacedMessage("staff.vanish.placeholder.abovename.false").translate()
                 }
+            }
+            "staffchat-status" -> {
+                if (StaffChatManager.isStaffChatEnabled(player)) {
+                    language.getReplacedMessage("staff.chat.placeholder.status.true").translate()
+                } else {
+                    language.getReplacedMessage("staff.chat.placeholder.status.false").translate()
+                }
+            }
+            "dupe-charges" -> {
+                val charges = (dupeManager.getDupeCount(player) ?: 0)
+                language.getReplacedMessage("dupe.placeholder.charges").replace("%charges%", charges.toString()).translate()
             }
             else -> "&cError: Placeholder not found".translate()
         }

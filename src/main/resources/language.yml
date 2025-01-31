@@ -13,6 +13,7 @@ staff:
     action-bar: "&aYou are in vanish. Other players cannot see you"
     boss-bar: "&a&lVANISH &8• &fYou are in vanish"
     placeholder:
+      charges: "%charges%"
       tag:
         true: "&7[V] "
         false: ""

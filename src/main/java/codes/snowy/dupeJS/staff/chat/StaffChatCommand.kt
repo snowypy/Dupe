@@ -23,7 +23,7 @@ class StaffChatCommand : BaseCommand() {
     @Description("[Ghost] Toggle staff chat or send a message to staff chat")
     fun onStaffChat(player: Player, @Optional message: String?) {
 
-        if (!player.hasPermission(config.getValue("permission.staff.chat").toString())) {
+        if (!player.hasPermission(config.getValue("permissions.staff.staff-chat").toString())) {
             player.sendMessage(language.getReplacedMessage("staff.chat.no-permission").translate())
             return
         }

@@ -39,7 +39,7 @@ object StaffChatManager {
             .replace("%message%", message)
 
         for (onlinePlayer in Bukkit.getOnlinePlayers()) {
-            if (onlinePlayer.hasPermission(config.getValue("permission.staff.chat.format").toString())) {
+            if (onlinePlayer.hasPermission(config.getValue("permissions.staff.staff-chat").toString())) {
                 onlinePlayer.sendMessage(staffMessage.translate())
             }
         }

@@ -14,7 +14,7 @@ class TeleportManager(private val plugin: JavaPlugin) {
         val countdownSeconds = 5
 
         player.playSound(player.location, "block.note_block.pling", 1f, 1f)
-        player.sendMessage("&#10f08a&lTeleporter &8» &#c4f5dfYou will be teleported to \"$name\" in $countdownSeconds seconds...".translate())
+        player.sendMessage("&#10f08a&lTELEPORTER &8| &#c4f5dfYou will be teleported to \"$name\" in $countdownSeconds seconds...".translate())
 
         object : BukkitRunnable() {
             var timeLeft = countdownSeconds
@@ -23,20 +23,20 @@ class TeleportManager(private val plugin: JavaPlugin) {
 
                 if (playerHasMoved(player, start)) {
                     player.playSound(player.location, "entity.enderman.death", 1f, 1f)
-                    player.sendMessage("&#10f08a&lTeleporter &8» &#f9445dYou moved! Teleportation cancelled.".translate())
+                    player.sendMessage("&#10f08a&lTELEPORTER &8| &#f9445dYou moved! Teleportation cancelled.".translate())
                     cancel()
                     return
                 }
 
                 if (timeLeft <= 1) {
-                    player.sendMessage("&#10f08a&lTeleporter &8» &#c4f5dfYou have been teleported to \"$name\"!".translate())
+                    player.sendMessage("&#10f08a&lTELEPORTER &8| &#c4f5dfYou have been teleported to \"$name\"!".translate())
                     player.teleport(location)
                     player.playSound(player.location, "entity.enderman.teleport", 1f, 1f)
                     cancel()
                 } else {
                     timeLeft -= 1
                     player.playSound(player.location, "block.note_block.pling", 1f, 1f)
-                    player.sendMessage("&#10f08a&lTeleporter &8» &#c4f5dfYou will be teleported to \"$name\" in $timeLeft seconds...".translate())
+                    player.sendMessage("&#10f08a&lTELEPORTER &8| &#c4f5dfYou will be teleported to \"$name\" in $timeLeft seconds...".translate())
                 }
             }
         }.runTaskTimer(plugin, 20, 20)

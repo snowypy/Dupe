@@ -1,6 +1,7 @@
 package codes.snowy.dupeJS;
 
 import co.aikar.commands.PaperCommandManager;
+import codes.snowy.dupeJS.adminutils.commands.HealCommand;
 import codes.snowy.dupeJS.session.SessionListener;
 import codes.snowy.dupeJS.staff.chat.StaffChatCommand;
 import codes.snowy.dupeJS.staff.chat.StaffChatListener;
@@ -88,6 +89,8 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the StaffChat Command", "success");
         manager.registerCommand(new VanishCommand());
         Logger.INSTANCE.log("Loaded the Vanish Command", "success");
+        manager.registerCommand(new HealCommand());
+        Logger.INSTANCE.log("Loaded the Heal Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");

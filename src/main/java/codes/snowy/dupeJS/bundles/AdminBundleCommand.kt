@@ -37,7 +37,7 @@ class AdminBundleCommand(private val config: Config) : BaseCommand() {
     @CommandCompletion("@players @bundles")
     fun onGive(sender: Player, @Flags("other") target: Player, @Single bundleName: String) {
         val bundle = BundleManager.getBundle(bundleName) ?: run {
-            sender.sendMessage("&#FAAAAA&lBUNDLES &8| &#FF0000Bundle not found.")
+            sender.sendMessage("&#FAAAAA&lBUNDLES &8| &#FF0000Bundle not found.".translate())
             return
         }
 

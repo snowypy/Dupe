@@ -10,6 +10,7 @@ import net.luckperms.api.model.user.User
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerChatEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
@@ -23,7 +24,7 @@ class StaffChatListener : Listener {
     fun onPlayerJoin(event: PlayerJoinEvent) {
         val player = event.player
 
-        if (player.hasPermission("${config.getValue("permission.staff")}")) {
+        if (player.hasPermission("${config.getValue("permission.staff.join-messages")}")) {
             val user: User = luckPerms.userManager.getUser(player.uniqueId) ?: return
             val prefix = user.cachedData.metaData.prefix ?: ""
 
@@ -34,7 +35,7 @@ class StaffChatListener : Listener {
                 .replace("%gamemode%", config.getValue("server-name").toString())
 
             for (onlinePlayer in Bukkit.getOnlinePlayers()) {
-                if (onlinePlayer.hasPermission("${config.getValue("permission.staff")}")) {
+                if (onlinePlayer.hasPermission("${config.getValue("permission.staff.quit-messages")}")) {
                     onlinePlayer.sendMessage(joinMessage.translate())
                 }
             }
@@ -51,14 +52,26 @@ class StaffChatListener : Listener {
 
             val quitMessage = language.getReplacedMessage("staff.quit").toString()
                 .replace("%prefix%", prefix)
-                .replace("%player%", "${player.name}")
+                .replace("%player%", player.name)
                 .replace("%uuid%", player.uniqueId.toString())
+                .replace("%gamemode%", config.getValue("server-name").toString())
 
             for (onlinePlayer in Bukkit.getOnlinePlayers()) {
                 if (onlinePlayer.hasPermission("${config.getValue("permission.staff.notify")}")) {
                     onlinePlayer.sendMessage(quitMessage.translate())
                 }
             }
+        }
+    }
+
+    @EventHandler
+    fun onStaffChat(event: PlayerChatEvent) {
+        val player = event.player
+        val message = event.message
+
+        if (StaffChatManager.isStaffChatEnabled(player)) {
+            event.isCancelled = true
+            StaffChatManager.sendStaffChatMessage(player, message)
         }
     }
 

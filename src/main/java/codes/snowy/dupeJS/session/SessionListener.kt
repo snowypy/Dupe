@@ -1,7 +1,7 @@
 package codes.snowy.dupeJS.session
 
+import codes.snowy.dupeJS.staff.vanish.VanishManager
 import codes.snowy.dupeJS.utils.translate
-import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -12,8 +12,12 @@ class SessionListener: Listener {
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
         val player = event.player
+        if (VanishManager.isVanished(player)) {
+            event.joinMessage = "TRUE IS VANISHED"
+            VanishManager.toggleVanish(player, true)
+            return
+        }
         if (player.hasPermission("dupejs.staff")) {
-            // [$] Add vanish check.
             event.joinMessage = "&8[&c+&8] &c&o${player.name} &f&ohas connected".translate()
             return
         } else if (player.hasPermission("dupejs.donator")) {
@@ -26,10 +30,10 @@ class SessionListener: Listener {
     @EventHandler
     fun onQuit(event: PlayerQuitEvent) {
         val player = event.player
-        event.quitMessage = ""
-        Bukkit.getOnlinePlayers()
-            .filter { it.hasPermission("dupejs.staff") }
-            .forEach { it.sendMessage("&8[INSPECT] &7&o${player.name} &c(${Bukkit.getOnlinePlayers().size})".translate()) }
-    }
+        if (VanishManager.isVanished(player)) {
 
+            return
+        }
+        event.quitMessage = ""
+    }
 }

@@ -35,16 +35,16 @@ object VanishManager {
         }.runTaskTimerAsynchronously(DupeJS.getInstance(), 0L, 20L)
     }
 
-    fun toggleVanish(player: Player): Boolean {
-        return if (vanishedPlayers.contains(player)) {
-            vanishedPlayers.remove(player)
-            removeBossBar(player)
-            false
-        } else {
+    fun toggleVanish(player: Player, forceState: Boolean? = null): Boolean {
+        val shouldVanish = forceState ?: !vanishedPlayers.contains(player)
+        if (shouldVanish) {
             vanishedPlayers.add(player)
             showBossBar(player)
-            true
+        } else {
+            vanishedPlayers.remove(player)
+            removeBossBar(player)
         }
+        return shouldVanish
     }
 
     fun isVanished(player: Player): Boolean {
