@@ -33,3 +33,17 @@ staff:
     format: "&#47c3f2&lSTAFFCHAT &8• &#47c3f2%prefix%%player%&f: %message%"
     no-permission: "&cYou do not have permission to use that command."
     admin: "&7[ADMIN] &f{PLAYER}: {MESSAGE}"
+
+tpa:
+  send-request: "&aYou have sent a request to %target%! You can cancel this with &7/tpacancel <player>"
+  receive-request: "&a%target% has sent you a teleport request! You can accept this with &7/tpaccept %target% &7or deny it with &7/tpdeny <player>"
+  accept-request: "&a%target% has accepted your teleport request"
+  teleport-countdown: "&aYou will teleport to %target% in %cooldown%s &c&nDON'T MOVE"
+  teleport-countdown-other: "&a%target% will teleport to you in %cooldown%s!"
+  teleport-countdown-cancel: "&cTeleportation cancelled, you moved! &7Send a new request using &a&n/tpa&r &7or &a&n/tpahere&7!"
+  teleport-countdown-cancel-other: "&cTeleportation cancelled, %target% moved!"
+  teleport-denied-other: "&c%target% has denied your teleport request"
+  teleport-denied: "&cYou have denied %target%'s teleport request"
+  teleport-complete: "&aYou have been teleported to %target%!"
+  teleport-complete-other: "&a%target% has teleported to you."
+  teleport-notfound: "&cTeleport from \"%%target\" not found or cancelled."

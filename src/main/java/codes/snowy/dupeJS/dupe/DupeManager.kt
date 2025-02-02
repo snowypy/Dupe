@@ -77,9 +77,18 @@ class DupeManager {
     fun dupe(player: Player) {
         val playerUUID = player.uniqueId
         val playerRank = getPlayerRank(player)
+        if (config.getBoolean("dupe.debug", false)) {
+            Logger.log("Player rank: $playerRank", "debug")
+        }
         val maxDupes = rankDupeLimits[playerRank] ?: rankDupeLimits["default"]!!
+        if (config.getBoolean("dupe.debug", false)) {
+            Logger.log("Max dupes: $maxDupes", "debug")
+        }
 
         val currentDupes = dupeCounts.getOrDefault(playerUUID, 0)
+        if (config.getBoolean("dupe.debug", false)) {
+            Logger.log("Current dupes: $currentDupes", "debug")
+        }
         if (currentDupes >= maxDupes) {
             player.sendMessage("&#7723ea&lDUPE &8| &cYou have reached your dupe limit for today.".translate())
             return
@@ -117,7 +126,32 @@ class DupeManager {
     }
 
     fun getDupeCount(player: Player): Int {
-        return dupeCounts.getOrDefault(player.uniqueId, 0)
+        val dupeCounts = dupeCounts.getOrDefault(player.uniqueId, 0)
+        if (config.getBoolean("dupe.debug", false)) {
+            Logger.log("Dupe count for ${player.name}: $dupeCounts", "debug")
+        }
+        return dupeCounts
+    }
+
+    fun getMaxDupeCount(player: Player): Int {
+        val playerRank = getPlayerRank(player)
+        val maxDupes = rankDupeLimits[playerRank] ?: rankDupeLimits["default"]!!
+        if (config.getBoolean("dupe.debug", false)) {
+            Logger.log("Max dupe count for ${player.name}: $maxDupes", "debug")
+        }
+        return maxDupes
+    }
+
+    fun getRechargeTime(player: Player): Int {
+        val playerRank = getPlayerRank(player)
+        val maxDupes = rankDupeLimits[playerRank] ?: rankDupeLimits["default"]!!
+        val currentDupes = dupeCounts.getOrDefault(player.uniqueId, 0)
+        val remainingDupes = maxDupes - currentDupes
+        val rechargeTime = remainingDupes * config.getInt("dupe.recharge-time", 60)
+        if (config.getBoolean("dupe.debug", false)) {
+            Logger.log("Recharge time for ${player.name}: $rechargeTime", "debug")
+        }
+        return rechargeTime
     }
 
     fun blacklistDupe(player: Player) {

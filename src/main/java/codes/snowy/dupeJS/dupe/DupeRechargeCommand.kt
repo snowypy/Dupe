@@ -6,6 +6,7 @@ import codes.snowy.dupeJS.utils.translate
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
+@CommandAlias("rechargedupe")
 class DupeRechargeCommand(val dupeManager: DupeManager) : BaseCommand() {
 
     @HelpCommand

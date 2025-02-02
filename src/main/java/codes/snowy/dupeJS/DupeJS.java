@@ -2,12 +2,16 @@ package codes.snowy.dupeJS;
 
 import co.aikar.commands.PaperCommandManager;
 import codes.snowy.dupeJS.adminutils.commands.HealCommand;
+import codes.snowy.dupeJS.basic.SetSpawnCommand;
+import codes.snowy.dupeJS.basic.SpawnCommand;
+import codes.snowy.dupeJS.dupe.DupeRechargeCommand;
 import codes.snowy.dupeJS.session.SessionListener;
 import codes.snowy.dupeJS.staff.chat.StaffChatCommand;
 import codes.snowy.dupeJS.staff.chat.StaffChatListener;
 import codes.snowy.dupeJS.staff.chat.StaffChatManager;
 import codes.snowy.dupeJS.staff.vanish.VanishListener;
 import codes.snowy.dupeJS.staff.vanish.VanishManager;
+import codes.snowy.dupeJS.tpa.TpaCommand;
 import codes.snowy.dupeJS.utils.CommandCompletions;
 import codes.snowy.dupeJS.bundles.AdminBundleCommand;
 import codes.snowy.dupeJS.bundles.BundleListener;
@@ -28,6 +32,7 @@ import codes.snowy.dupeJS.utils.Config;
 import codes.snowy.dupeJS.utils.Language;
 import codes.snowy.dupeJS.utils.Logger;
 import codes.snowy.dupeJS.staff.vanish.VanishCommand;
+import codes.snowy.dupeJS.utils.PlaceholderHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
@@ -57,6 +62,18 @@ public final class DupeJS extends JavaPlugin {
         DupeJS.instance = this;
 
         loadConfig();
+
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            Logger.INSTANCE.log("PlaceholderAPI has been detected and is enabled", "success");
+            new PlaceholderHandler(this).register();
+        } else {
+            Logger.INSTANCE.log("PlaceholderAPI has not been detected or is not enabled", "error");
+            Logger.INSTANCE.log("DupeJS will not work properly without PlaceholderAPI", "error");
+            Logger.INSTANCE.log("Auto disabling DupeJS... contact @snowyjs", "error");
+            Bukkit.getPluginManager().disablePlugin(this);
+            return;
+        }
+
         homeManager = new HomeManager();
         teleportManager = new TeleportManager(this);
         dupeManager = new DupeManager();
@@ -91,6 +108,14 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Vanish Command", "success");
         manager.registerCommand(new HealCommand());
         Logger.INSTANCE.log("Loaded the Heal Command", "success");
+        manager.registerCommand(new SpawnCommand());
+        Logger.INSTANCE.log("Loaded the Spawn Command", "success");
+        manager.registerCommand(new SetSpawnCommand());
+        Logger.INSTANCE.log("Loaded the SetSpawn Command", "success");
+        manager.registerCommand(new TpaCommand());
+        Logger.INSTANCE.log("Loaded the Tpa Command", "success");
+        manager.registerCommand(new DupeRechargeCommand(dupeManager));
+        Logger.INSTANCE.log("Loaded the DupeRecharge Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
