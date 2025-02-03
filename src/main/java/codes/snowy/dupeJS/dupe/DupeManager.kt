@@ -33,7 +33,7 @@ class DupeManager {
     )
 
     init {
-        dbConnection = DriverManager.getConnection("jdbc:sqlite:dupeCounts.db")
+        dbConnection = DriverManager.getConnection("jdbc:sqlite:Databases/dupe.db")
         createTable()
         loadDupeCounts()
     }
@@ -126,11 +126,11 @@ class DupeManager {
     }
 
     fun getDupeCount(player: Player): Int {
-        val dupeCounts = dupeCounts.getOrDefault(player.uniqueId, 0)
+        val dupeCountz = dupeCounts.getOrDefault(player.uniqueId, 0)
         if (config.getBoolean("dupe.debug", false)) {
-            Logger.log("Dupe count for ${player.name}: $dupeCounts", "debug")
+            Logger.log("Dupe count for ${player.name}: $dupeCountz", "debug")
         }
-        return dupeCounts
+        return dupeCountz
     }
 
     fun getMaxDupeCount(player: Player): Int {

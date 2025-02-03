@@ -25,9 +25,9 @@ class PlaceholderHandler(plugin: DupeJS) : PlaceholderExpansion() {
         return true
     }
 
-    fun onRequest(player: Player, params: String): String? {
+    override fun onPlaceholderRequest(player: Player, params: String): String? {
         if (params.equals("dupe-charges", ignoreCase = true)) {
-            val charges = (dupeManager.getMaxDupeCount(player) - dupeManager.getMaxDupeCount(player)).toString()
+            val charges = (dupeManager.getMaxDupeCount(player) - dupeManager.getDupeCount(player)).toString()
             return charges
         } else if (params.equals("dupe-max-charges", ignoreCase = true)) {
             val maxCharges = dupeManager.getMaxDupeCount(player).toString()
