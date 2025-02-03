@@ -21,7 +21,6 @@ import kotlin.collections.HashMap
 class DupeManager {
 
     private val config = Config(DupeJS.getInstance())
-    private val dupeCounts: MutableMap<UUID, Int> = HashMap()
     private val dbConnection: Connection
 
     private val rankDupeLimits: Map<String, Int> = mapOf(
@@ -35,24 +34,11 @@ class DupeManager {
     init {
         dbConnection = DriverManager.getConnection("jdbc:sqlite:Databases/dupe.db")
         createTable()
-        loadDupeCounts()
     }
 
     private fun createTable() {
         val statement = dbConnection.createStatement()
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS dupe_counts (uuid TEXT PRIMARY KEY, count INTEGER)")
-        statement.close()
-    }
-
-    private fun loadDupeCounts() {
-        val statement = dbConnection.createStatement()
-        val resultSet = statement.executeQuery("SELECT * FROM dupe_counts")
-        while (resultSet.next()) {
-            val uuid = UUID.fromString(resultSet.getString("uuid"))
-            val count = resultSet.getInt("count")
-            dupeCounts[uuid] = count
-        }
-        resultSet.close()
         statement.close()
     }
 
@@ -64,12 +50,21 @@ class DupeManager {
         statement.close()
     }
 
+    private fun getDupeCountFromDB(uuid: UUID): Int {
+        val statement: PreparedStatement = dbConnection.prepareStatement("SELECT count FROM dupe_counts WHERE uuid = ?")
+        statement.setString(1, uuid.toString())
+        val resultSet: ResultSet = statement.executeQuery()
+        val count = if (resultSet.next()) resultSet.getInt("count") else 0
+        resultSet.close()
+        statement.close()
+        return count
+    }
+
     fun rechargeDupe(player: Player) {
         val playerUUID = player.uniqueId
         val playerRank = getPlayerRank(player)
         val maxDupes = rankDupeLimits[playerRank] ?: rankDupeLimits["default"]!!
 
-        dupeCounts[playerUUID] = maxDupes
         saveDupeCount(playerUUID, maxDupes)
         player.sendMessage("&#7723ea&lDUPE &8| &#98f81dYou have recharged your dupe limit.".translate())
     }
@@ -85,7 +80,7 @@ class DupeManager {
             Logger.log("Max dupes: $maxDupes", "debug")
         }
 
-        val currentDupes = dupeCounts.getOrDefault(playerUUID, 0)
+        val currentDupes = getDupeCountFromDB(playerUUID)
         if (config.getBoolean("dupe.debug", false)) {
             Logger.log("Current dupes: $currentDupes", "debug")
         }
@@ -114,7 +109,6 @@ class DupeManager {
 
         player.inventory.addItem(item)
         val newCount = currentDupes + 1
-        dupeCounts[playerUUID] = newCount
         saveDupeCount(playerUUID, newCount)
         val itemformat = item.type.toString().formatMaterial()
 
@@ -126,7 +120,7 @@ class DupeManager {
     }
 
     fun getDupeCount(player: Player): Int {
-        val dupeCountz = dupeCounts.getOrDefault(player.uniqueId, 0)
+        val dupeCountz = getDupeCountFromDB(player.uniqueId)
         if (config.getBoolean("dupe.debug", false)) {
             Logger.log("Dupe count for ${player.name}: $dupeCountz", "debug")
         }
@@ -145,7 +139,7 @@ class DupeManager {
     fun getRechargeTime(player: Player): Int {
         val playerRank = getPlayerRank(player)
         val maxDupes = rankDupeLimits[playerRank] ?: rankDupeLimits["default"]!!
-        val currentDupes = dupeCounts.getOrDefault(player.uniqueId, 0)
+        val currentDupes = getDupeCountFromDB(player.uniqueId)
         val remainingDupes = maxDupes - currentDupes
         val rechargeTime = remainingDupes * config.getInt("dupe.recharge-time", 60)
         if (config.getBoolean("dupe.debug", false)) {
