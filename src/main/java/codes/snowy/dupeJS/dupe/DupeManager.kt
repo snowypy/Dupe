@@ -66,7 +66,7 @@ class DupeManager {
         val maxDupes = rankDupeLimits[playerRank] ?: rankDupeLimits["default"]!!
 
         saveDupeCount(playerUUID, maxDupes)
-        player.sendMessage("&#7723ea&lDUPE &8| &#98f81dYou have recharged your dupe limit.".translate())
+        player.sendMessage("&#ff3358&lDUPE &8| &fYou have &#98f81d&nRECHARGED&f your dupe limit!".translate())
     }
 
     fun dupe(player: Player) {
@@ -85,7 +85,7 @@ class DupeManager {
             Logger.log("Current dupes: $currentDupes", "debug")
         }
         if (currentDupes >= maxDupes) {
-            player.sendMessage("&#7723ea&lDUPE &8| &cYou have reached your dupe limit for today.".translate())
+            player.sendMessage("&#ff3358&lDUPE &8| &#ff0000&nHey!&r &fYou have reached your &#ff0000&nDUPE LIMIT&f. You can UPGRADE it by buying a rank from our &#9ef52f&n/store".translate())
             return
         }
 
@@ -93,17 +93,17 @@ class DupeManager {
         val itemamount = item.amount
 
         if (item.type.toString() == "AIR") {
-            player.sendMessage("&#7723ea&lDUPE &8| &cYou are not holding an item.".translate())
+            player.sendMessage("&#ff3358&lDUPE &8| &#ff0000&nHey!&r &fYou are not holding an item.".translate())
             return
         }
 
         if (player.inventory.size <= 36) {
-            player.sendMessage("&#7723ea&lDUPE &8| &cYour inventory is full.".translate())
+            player.sendMessage("&#ff3358&lDUPE &8| &#ff0000&nHey!&r &fYour inventory is full.".translate())
             return
         }
 
         if (nbtCheck(item)) {
-            player.sendMessage("&#7723ea&lDUPE &8| &cThis item is not allowed to be duplicated.".translate())
+            player.sendMessage("&#ff3358&lDUPE &8| &#ff0000&nHey!&r &fYou are trying to dupe a &#ff0000&nBLACKLISTED&f item.".translate())
             return
         }
 
@@ -113,26 +113,20 @@ class DupeManager {
         val itemformat = item.type.toString().formatMaterial()
 
         if (itemamount > 1) {
-            player.sendMessage("&#7723ea&lDUPE &8| &#98f81dYou have duplicated &#ac9ac6$itemamount&#ac9ac6x $itemformat".translate())
+            player.sendMessage("&#ff3358&lDUPE &8| &fYou have duplicated &#ff3358$itemamount&#ff3358 $itemformat".translate())
         } else {
-            player.sendMessage("&#7723ea&lDUPE &8| &#98f81dYou have duplicated a &#ac9ac6$itemformat".translate())
+            player.sendMessage("&#ff3358&lDUPE &8| &fYou have duplicated a &#ff3358$itemformat".translate())
         }
     }
 
     fun getDupeCount(player: Player): Int {
         val dupeCountz = getDupeCountFromDB(player.uniqueId)
-        if (config.getBoolean("dupe.debug", false)) {
-            Logger.log("Dupe count for ${player.name}: $dupeCountz", "debug")
-        }
         return dupeCountz
     }
 
     fun getMaxDupeCount(player: Player): Int {
         val playerRank = getPlayerRank(player)
         val maxDupes = rankDupeLimits[playerRank] ?: rankDupeLimits["default"]!!
-        if (config.getBoolean("dupe.debug", false)) {
-            Logger.log("Max dupe count for ${player.name}: $maxDupes", "debug")
-        }
         return maxDupes
     }
 
@@ -153,19 +147,19 @@ class DupeManager {
         var item = player.itemInHand
 
         if (item.type.toString() == "AIR") {
-            player.sendMessage("&#7723ea&lDUPE &8| &cYou are not holding an item.".translate())
+            player.sendMessage("&#ff3358&lDUPE &8| &#ff0000&nHey!&r &fYou must be holding an item!".translate())
             return
         }
 
         if (nbtCheck(item)) {
-            player.sendMessage("&#7723ea&lDUPE &8| &cThis item is already blacklisted.".translate())
+            player.sendMessage("&#ff3358&lDUPE &8| &fThis item is &#ff0000&nalready blacklisted&f.".translate())
             return
         }
 
         val nbtItem = NBTItem(item)
         nbtItem.setInteger("custom_model_data", config.getInt("dupe.modeldata", 1111))
         player.setItemInHand(nbtItem.item)
-        player.sendMessage("&#7723ea&lDUPE &8| &#98f81dYou have blacklisted this item.".translate())
+        player.sendMessage("&#ff3358&lDUPE &8| &fThis item is now &#98f81d&nBLOCKED".translate())
     }
 
     fun nbtCheck(stack: ItemStack): Boolean {
@@ -185,10 +179,10 @@ class DupeManager {
 
     private fun getPlayerRank(player: Player): String {
         return when {
-            player.hasPermission("dupe.rank.patron") -> "patron"
-            player.hasPermission("dupe.rank.reaper") -> "reaper"
+            player.hasPermission("dupe.rank.hero") -> "hero"
+            player.hasPermission("dupe.rank.ultra") -> "ultra"
             player.hasPermission("dupe.rank.pro") -> "pro"
-            player.hasPermission("dupe.rank.vip") -> "vip"
+            player.hasPermission("dupe.rank.titan") -> "vip"
             else -> "default"
         }
     }

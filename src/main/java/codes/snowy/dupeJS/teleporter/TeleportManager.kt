@@ -53,6 +53,7 @@ class TeleportManager(private val plugin: JavaPlugin) {
         // target: The person who ran /tpa <player>
 
         val start = sender.location
+        val accepteeLoc = acceptee.location
         val countdownSeconds = 5
 
         acceptee.playSound(acceptee.location, "block.note_block.pling", 1f, 1f)
@@ -65,7 +66,7 @@ class TeleportManager(private val plugin: JavaPlugin) {
             var timeLeft = countdownSeconds
 
             override fun run() {
-                if (playerHasMoved(acceptee, start)) {
+                if (playerHasMoved(acceptee, accepteeLoc)) {
                     acceptee.playSound(acceptee.location, "entity.enderman.death", 1f, 1f)
                     acceptee.sendMessage(language.getMessages("tpa.teleport-countdown-cancel").translate())
                     sender.sendMessage(language.getMessages("tpa.teleport-countdown-cancel-other")

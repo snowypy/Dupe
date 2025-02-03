@@ -11,6 +11,7 @@ import codes.snowy.dupeJS.staff.chat.StaffChatListener;
 import codes.snowy.dupeJS.staff.chat.StaffChatManager;
 import codes.snowy.dupeJS.staff.vanish.VanishListener;
 import codes.snowy.dupeJS.staff.vanish.VanishManager;
+import codes.snowy.dupeJS.tpa.TpaAcceptCommand;
 import codes.snowy.dupeJS.tpa.TpaCommand;
 import codes.snowy.dupeJS.utils.CommandCompletions;
 import codes.snowy.dupeJS.bundles.AdminBundleCommand;
@@ -114,6 +115,8 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the SetSpawn Command", "success");
         manager.registerCommand(new TpaCommand());
         Logger.INSTANCE.log("Loaded the Tpa Command", "success");
+        manager.registerCommand(new TpaAcceptCommand());
+        Logger.INSTANCE.log("Loaded the TpaAccept Command", "success");
         manager.registerCommand(new DupeRechargeCommand(dupeManager));
         Logger.INSTANCE.log("Loaded the DupeRecharge Command", "success");
 
