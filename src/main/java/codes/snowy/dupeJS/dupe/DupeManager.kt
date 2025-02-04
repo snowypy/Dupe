@@ -25,10 +25,10 @@ class DupeManager {
 
     private val rankDupeLimits: Map<String, Int> = mapOf(
         "default" to 30,
-        "vip" to 50,
+        "titan" to 50,
         "pro" to 100,
-        "reaper" to 175,
-        "patron" to 250
+        "ultra" to 175,
+        "hero" to 250
     )
 
     init {
@@ -113,7 +113,7 @@ class DupeManager {
         val itemformat = item.type.toString().formatMaterial()
 
         if (itemamount > 1) {
-            player.sendMessage("&#ff3358&lDUPE &8| &fYou have duplicated &#ff3358$itemamount&#ff3358 $itemformat".translate())
+            player.sendMessage("&#ff3358&lDUPE &8| &fYou have duplicated &#ff3358$itemamount&#ff3358x $itemformat".translate())
         } else {
             player.sendMessage("&#ff3358&lDUPE &8| &fYou have duplicated a &#ff3358$itemformat".translate())
         }
