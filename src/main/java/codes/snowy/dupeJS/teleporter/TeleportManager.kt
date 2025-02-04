@@ -3,6 +3,9 @@ package codes.snowy.dupeJS.teleporter
 import codes.snowy.dupeJS.utils.Config
 import codes.snowy.dupeJS.utils.Language
 import codes.snowy.dupeJS.utils.translate
+import net.luckperms.api.LuckPerms
+import net.luckperms.api.LuckPermsProvider
+import net.luckperms.api.model.user.User
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.Player
@@ -13,6 +16,7 @@ class TeleportManager(private val plugin: JavaPlugin) {
 
     private val config = Config(plugin)
     private val language = Language(plugin, config)
+    private val luckPerms: LuckPerms = LuckPermsProvider.get()
 
     fun teleportPlayer(player: Player, location: Location, name: String = "location") {
         val start = player.location
@@ -47,7 +51,7 @@ class TeleportManager(private val plugin: JavaPlugin) {
         }.runTaskTimer(plugin, 20, 20)
     }
 
-    fun tpaTeleport(acceptee: Player, location: Location, sender: Player) {
+    fun tpaTeleport(acceptee: Player, sender: Player) {
         // player: The person who accepted a /tpa request
         // location: The location to teleport the target to
         // target: The person who ran /tpa <player>
@@ -57,9 +61,17 @@ class TeleportManager(private val plugin: JavaPlugin) {
         val countdownSeconds = 5
 
         acceptee.playSound(acceptee.location, "block.note_block.pling", 1f, 1f)
+        sender.playSound(sender.location, "block.note_block.pling", 1f, 1f)
+        val user: User = luckPerms.userManager.getUser(acceptee.uniqueId) ?: return
+        val prefix = user.cachedData.metaData.prefix ?: ""
         acceptee.sendMessage(language.getMessages("tpa.teleport-countdown")
             .replace("%target%", sender.name)
             .replace("%cooldown%", countdownSeconds.toString())
+            .translate())
+        sender.sendMessage(language.getMessages("tpa.teleport-countdown-other")
+            .replace("%target%", acceptee.name)
+            .replace("%cooldown%", countdownSeconds.toString())
+            .replace("%prefix%", prefix)
             .translate())
 
         object : BukkitRunnable() {
@@ -68,6 +80,7 @@ class TeleportManager(private val plugin: JavaPlugin) {
             override fun run() {
                 if (playerHasMoved(acceptee, accepteeLoc)) {
                     acceptee.playSound(acceptee.location, "entity.enderman.death", 1f, 1f)
+                    sender.playSound(sender.location, "entity.enderman.death", 1f, 1f)
                     acceptee.sendMessage(language.getMessages("tpa.teleport-countdown-cancel").translate())
                     sender.sendMessage(language.getMessages("tpa.teleport-countdown-cancel-other")
                         .replace("%target%", acceptee.name)
@@ -83,7 +96,8 @@ class TeleportManager(private val plugin: JavaPlugin) {
                     sender.sendMessage(language.getMessages("tpa.teleport-complete-other")
                         .replace("%target%", acceptee.name)
                         .translate())
-                    acceptee.teleport(location)
+
+                    acceptee.teleport(sender.location)
                     acceptee.playSound(acceptee.location, "entity.enderman.teleport", 1f, 1f)
                     sender.playSound(sender.location, "entity.enderman.teleport", 1f, 1f)
                     cancel()
@@ -91,6 +105,8 @@ class TeleportManager(private val plugin: JavaPlugin) {
                     timeLeft -= 1
                     acceptee.playSound(acceptee.location, "block.note_block.pling", 1f, 1f)
                     sender.playSound(sender.location, "block.note_block.pling", 1f, 1f)
+                    val user: User = luckPerms.userManager.getUser(acceptee.uniqueId) ?: return
+                    val prefix = user.cachedData.metaData.prefix ?: ""
                     acceptee.sendMessage(language.getMessages("tpa.teleport-countdown")
                         .replace("%target%", sender.name)
                         .replace("%cooldown%", timeLeft.toString())
@@ -98,6 +114,7 @@ class TeleportManager(private val plugin: JavaPlugin) {
                     sender.sendMessage(language.getMessages("tpa.teleport-countdown-other")
                         .replace("%target%", acceptee.name)
                         .replace("%cooldown%", timeLeft.toString())
+                        .replace("%prefix%", prefix)
                         .translate())
                 }
             }
