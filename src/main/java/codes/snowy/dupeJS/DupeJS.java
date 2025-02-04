@@ -2,8 +2,10 @@ package codes.snowy.dupeJS;
 
 import co.aikar.commands.PaperCommandManager;
 import codes.snowy.dupeJS.adminutils.commands.HealCommand;
+import codes.snowy.dupeJS.basic.DiscordCommand;
 import codes.snowy.dupeJS.basic.SetSpawnCommand;
 import codes.snowy.dupeJS.basic.SpawnCommand;
+import codes.snowy.dupeJS.basic.StoreCommand;
 import codes.snowy.dupeJS.dupe.DupeRechargeCommand;
 import codes.snowy.dupeJS.session.SessionListener;
 import codes.snowy.dupeJS.staff.chat.StaffChatCommand;
@@ -119,6 +121,10 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the TpaAccept Command", "success");
         manager.registerCommand(new DupeRechargeCommand(dupeManager));
         Logger.INSTANCE.log("Loaded the DupeRecharge Command", "success");
+        manager.registerCommand(new DiscordCommand());
+        Logger.INSTANCE.log("Loaded the Discord Command", "success");
+        manager.registerCommand(new StoreCommand());
+        Logger.INSTANCE.log("Loaded the Store Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
