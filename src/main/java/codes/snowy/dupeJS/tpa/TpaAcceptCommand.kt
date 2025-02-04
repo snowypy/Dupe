@@ -9,7 +9,7 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-@CommandAlias("tpaccept|tpyes|tpaccept|tpacceptyes")
+@CommandAlias("tpaccept|tpyes|tpaaccept")
 class TpaAcceptCommand: BaseCommand() {
 
     private val tpaManager = TpaManager()
@@ -17,7 +17,6 @@ class TpaAcceptCommand: BaseCommand() {
     @Default
     @CommandCompletion("@players")
     fun onTpaAcceptCommand(acceptee: CommandSender, senderName: String?) {
-
         if (acceptee !is Player) {
             acceptee.sendMessage("&cOnly players can use this command.".translate())
             return
