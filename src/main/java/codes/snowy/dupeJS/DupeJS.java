@@ -2,6 +2,8 @@ package codes.snowy.dupeJS;
 
 import co.aikar.commands.PaperCommandManager;
 import codes.snowy.dupeJS.adminutils.commands.HealCommand;
+import codes.snowy.dupeJS.afk.AFKAdminCommand;
+import codes.snowy.dupeJS.afk.AFKManager;
 import codes.snowy.dupeJS.basic.DiscordCommand;
 import codes.snowy.dupeJS.basic.SetSpawnCommand;
 import codes.snowy.dupeJS.basic.SpawnCommand;
@@ -35,6 +37,7 @@ import codes.snowy.dupeJS.utils.Language;
 import codes.snowy.dupeJS.utils.Logger;
 import codes.snowy.dupeJS.staff.vanish.VanishCommand;
 import codes.snowy.dupeJS.utils.PlaceholderHandler;
+import codes.snowy.dupeJS.afk.AFKRewardTask;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
@@ -49,6 +52,8 @@ public final class DupeJS extends JavaPlugin {
     BundleManager bundleManager;
     StaffChatManager staffChatManager;
     VanishManager vanishManager;
+    AFKManager afkManager;
+    AFKRewardTask afkRewardTask;
     private Config config;
     private Language language;
     private static DupeJS instance;
@@ -81,6 +86,7 @@ public final class DupeJS extends JavaPlugin {
         dupeManager = new DupeManager();
         lifestealmanager = new LifestealManager();
         crushPlusManager = new CrushPlusManager(this);
+        afkManager = new AFKManager();
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("help");
@@ -130,6 +136,8 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Discord Command", "success");
         manager.registerCommand(new StoreCommand());
         Logger.INSTANCE.log("Loaded the Store Command", "success");
+        manager.registerCommand(new AFKAdminCommand(afkManager));
+        Logger.INSTANCE.log("Loaded the AFKAdmin Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
@@ -152,7 +160,14 @@ public final class DupeJS extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new VanishListener(this), this);
         Logger.INSTANCE.log("Loaded the Vanish Listener", "success");
 
-
+        Logger.INSTANCE.log("Starting the AFK Reward Task", "info");
+        if (afkRewardTask == null) {
+            Logger.INSTANCE.log("AFK Reward Task has not been initialized", "info");
+            afkRewardTask = new AFKRewardTask(this, afkManager);
+            Logger.INSTANCE.log("AFK Reward Task has been initialized", "success");
+        }
+        afkRewardTask.startAFKTimer(this, afkManager);
+        Logger.INSTANCE.log("AFK Reward Task has been started", "success");
 
     }
 
