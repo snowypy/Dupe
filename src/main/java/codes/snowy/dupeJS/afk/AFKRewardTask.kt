@@ -19,12 +19,12 @@ class AFKRewardTask(private val plugin: DupeJS, private val afkManager: AFKManag
             for (player in Bukkit.getOnlinePlayers()) {
                 if (isPlayerInAFKRegion(player)) {
                     val shardAmount = when {
-                        player.hasPermission("dupey.afk.t1") -> 1
-                        player.hasPermission("dupey.afk.t2") -> 2
-                        player.hasPermission("dupey.afk.t3") -> 3
-                        player.hasPermission("dupey.afk.t4") -> 4
-                        player.hasPermission("dupey.afk.t5") -> 5
                         player.hasPermission("dupey.afk.admin") -> 100
+                        player.hasPermission("dupey.afk.t5") -> 5
+                        player.hasPermission("dupey.afk.t4") -> 4
+                        player.hasPermission("dupey.afk.t3") -> 3
+                        player.hasPermission("dupey.afk.t2") -> 2
+                        player.hasPermission("dupey.afk.t1") -> 1
                         else -> 1
                     }
                     afkManager.addShards(player.uniqueId, shardAmount)
@@ -36,7 +36,7 @@ class AFKRewardTask(private val plugin: DupeJS, private val afkManager: AFKManag
         } else {
             for (player in Bukkit.getOnlinePlayers()) {
                 if (isPlayerInAFKRegion(player)) {
-                    val message = "&fTime until next reward: &#9436fe&n${secondsUntilReward / 60}m ${secondsUntilReward % 60}s".translate()
+                    val message = "&fTime until next reward: &x&9&4&3&6&F&E&n${secondsUntilReward / 60}m ${secondsUntilReward % 60}s".translate()
                     player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent(message))
                 }
             }
