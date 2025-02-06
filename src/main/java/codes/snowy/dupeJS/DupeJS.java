@@ -5,7 +5,11 @@ import codes.snowy.dupeJS.adminutils.commands.AdminCommand;
 import codes.snowy.dupeJS.adminutils.commands.HealCommand;
 import codes.snowy.dupeJS.afk.AFKAdminCommand;
 import codes.snowy.dupeJS.afk.AFKManager;
-import codes.snowy.dupeJS.basic.*;
+import codes.snowy.dupeJS.basic.DonorCommand;
+import codes.snowy.dupeJS.basic.DiscordCommand;
+import codes.snowy.dupeJS.basic.StoreCommand;
+import codes.snowy.dupeJS.basic.SpawnCommand;
+import codes.snowy.dupeJS.basic.SetSpawnCommand;
 import codes.snowy.dupeJS.dupe.DupeRechargeCommand;
 import codes.snowy.dupeJS.session.SessionListener;
 import codes.snowy.dupeJS.shards.ShardShopCommand;
@@ -16,7 +20,12 @@ import codes.snowy.dupeJS.staff.chat.StaffChatListener;
 import codes.snowy.dupeJS.staff.chat.StaffChatManager;
 import codes.snowy.dupeJS.staff.vanish.VanishListener;
 import codes.snowy.dupeJS.staff.vanish.VanishManager;
-import codes.snowy.dupeJS.tpa.*;
+import codes.snowy.dupeJS.tpa.TpaAcceptCommand;
+import codes.snowy.dupeJS.tpa.TpaCancelCommand;
+import codes.snowy.dupeJS.tpa.TpaCommand;
+import codes.snowy.dupeJS.tpa.TpaDenyCommand;
+import codes.snowy.dupeJS.tpa.TpaHereCommand;
+import codes.snowy.dupeJS.utils.Language;
 import codes.snowy.dupeJS.utils.CommandCompletions;
 import codes.snowy.dupeJS.bundles.AdminBundleCommand;
 import codes.snowy.dupeJS.bundles.BundleListener;
@@ -31,7 +40,16 @@ import codes.snowy.dupeJS.dupe.DupeManager;
 import codes.snowy.dupeJS.homes.HomeCommand;
 import codes.snowy.dupeJS.homes.HomeListener;
 import codes.snowy.dupeJS.homes.HomeManager;
-import codes.snowy.dupeJS.lifesteal.*;
+import codes.snowy.dupeJS.lifesteal.LifestealListener;
+import codes.snowy.dupeJS.lifesteal.LifestealManager;
+import codes.snowy.dupeJS.lifesteal.LSAdminCommand;
+import codes.snowy.dupeJS.lifesteal.PayHeartsCommand;
+import codes.snowy.dupeJS.lifesteal.WithdrawCommand;
+import codes.snowy.dupeJS.kits.commands.KitCommand;
+import codes.snowy.dupeJS.kits.commands.KitEditorCommand;
+import codes.snowy.dupeJS.kits.KitGUI;
+import codes.snowy.dupeJS.kits.KitListener;
+import codes.snowy.dupeJS.kits.KitManager;
 import codes.snowy.dupeJS.teleporter.TeleportManager;
 import codes.snowy.dupeJS.utils.Config;
 import codes.snowy.dupeJS.utils.Language;
@@ -39,6 +57,7 @@ import codes.snowy.dupeJS.utils.Logger;
 import codes.snowy.dupeJS.staff.vanish.VanishCommand;
 import codes.snowy.dupeJS.utils.PlaceholderHandler;
 import codes.snowy.dupeJS.afk.AFKRewardTask;
+import codes.snowy.dupeJS.kits.KitCooldownManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
@@ -59,6 +78,9 @@ public final class DupeJS extends JavaPlugin {
     private Config config;
     private Language language;
     private static DupeJS instance;
+    KitManager kitManager;
+    KitGUI kitGUI;
+    private KitCooldownManager kitCooldownManager;
 
     public static DupeJS getInstance() {
         return instance;
@@ -90,6 +112,9 @@ public final class DupeJS extends JavaPlugin {
         crushPlusManager = new CrushPlusManager(this);
         afkManager = new AFKManager();
         shardShopGUI = new ShardShopGUI(afkManager);
+        kitManager = new KitManager();
+        kitCooldownManager = new KitCooldownManager();
+        kitGUI = new KitGUI(kitManager, kitCooldownManager);
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("help");
@@ -147,6 +172,10 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Donor Command", "success");
         manager.registerCommand(new ShardShopCommand(shardShopGUI));
         Logger.INSTANCE.log("Loaded the ShardShop Command", "success");
+        manager.registerCommand(new KitCommand(kitManager, kitGUI, kitCooldownManager));
+        Logger.INSTANCE.log("Loaded the Kit Command", "success");
+        manager.registerCommand(new KitEditorCommand(kitManager, kitGUI));
+        Logger.INSTANCE.log("Loaded the Kit Editor Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
@@ -172,9 +201,12 @@ public final class DupeJS extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ShardShopListener(afkManager), this);
         Logger.INSTANCE.log("Loaded the ShardShop Listener", "success");
 
+        getServer().getPluginManager().registerEvents(new KitListener(kitManager, kitCooldownManager), this);
+        Logger.INSTANCE.log("Loaded the Kit Listener", "success");
+
         Logger.INSTANCE.log("Starting the AFK Reward Task", "info");
         if (afkRewardTask == null) {
-            Logger.INSTANCE.log("AFK Reward Task has not been initialized", "info");
+            Logger.INSTANCE.log("AFK Reward Task has not been initialized", "warning");
             afkRewardTask = new AFKRewardTask(this, afkManager);
             Logger.INSTANCE.log("AFK Reward Task has been initialized", "success");
         }
