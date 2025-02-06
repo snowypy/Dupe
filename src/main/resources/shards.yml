@@ -1,0 +1,24 @@
+shop:
+  items:
+    rank_upgrade:
+      displayName: "&#FF0000&lRANK UPGRADE"
+      material: DIAMOND
+      lore:
+        - "&7Purchase a rank upgrade using shards!"
+        - "&7"
+        - "&7Cost: &d1000 Shards"
+      price: 1000
+      commands:
+        - "lp user %player% parent set ultra"
+        - "broadcast &a%player% just purchased Ultra rank!"
+
+    money_pouch:
+      displayName: "&a&n$&r &fMoney Pouch &a&n$"
+      material: PAPER
+      lore:
+        - "&7Get a random amount of money!"
+        - "&7"
+        - "&7Cost: &d500 Shards"
+      price: 500
+      commands:
+        - "eco give %player% 1000000"
