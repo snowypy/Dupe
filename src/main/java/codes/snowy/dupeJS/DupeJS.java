@@ -1,13 +1,11 @@
 package codes.snowy.dupeJS;
 
 import co.aikar.commands.PaperCommandManager;
+import codes.snowy.dupeJS.adminutils.commands.AdminCommand;
 import codes.snowy.dupeJS.adminutils.commands.HealCommand;
 import codes.snowy.dupeJS.afk.AFKAdminCommand;
 import codes.snowy.dupeJS.afk.AFKManager;
-import codes.snowy.dupeJS.basic.DiscordCommand;
-import codes.snowy.dupeJS.basic.SetSpawnCommand;
-import codes.snowy.dupeJS.basic.SpawnCommand;
-import codes.snowy.dupeJS.basic.StoreCommand;
+import codes.snowy.dupeJS.basic.*;
 import codes.snowy.dupeJS.dupe.DupeRechargeCommand;
 import codes.snowy.dupeJS.session.SessionListener;
 import codes.snowy.dupeJS.staff.chat.StaffChatCommand;
@@ -138,6 +136,10 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Store Command", "success");
         manager.registerCommand(new AFKAdminCommand(afkManager));
         Logger.INSTANCE.log("Loaded the AFKAdmin Command", "success");
+        manager.registerCommand(new AdminCommand());
+        Logger.INSTANCE.log("Loaded the Admin Command", "success");
+        manager.registerCommand(new DonorCommand());
+        Logger.INSTANCE.log("Loaded the Donor Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
