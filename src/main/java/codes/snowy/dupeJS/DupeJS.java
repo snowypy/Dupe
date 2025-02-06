@@ -8,6 +8,9 @@ import codes.snowy.dupeJS.afk.AFKManager;
 import codes.snowy.dupeJS.basic.*;
 import codes.snowy.dupeJS.dupe.DupeRechargeCommand;
 import codes.snowy.dupeJS.session.SessionListener;
+import codes.snowy.dupeJS.shards.ShardShopCommand;
+import codes.snowy.dupeJS.shards.ShardShopGUI;
+import codes.snowy.dupeJS.shards.ShardShopListener;
 import codes.snowy.dupeJS.staff.chat.StaffChatCommand;
 import codes.snowy.dupeJS.staff.chat.StaffChatListener;
 import codes.snowy.dupeJS.staff.chat.StaffChatManager;
@@ -52,6 +55,7 @@ public final class DupeJS extends JavaPlugin {
     VanishManager vanishManager;
     AFKManager afkManager;
     AFKRewardTask afkRewardTask;
+    ShardShopGUI shardShopGUI;
     private Config config;
     private Language language;
     private static DupeJS instance;
@@ -85,6 +89,7 @@ public final class DupeJS extends JavaPlugin {
         lifestealmanager = new LifestealManager();
         crushPlusManager = new CrushPlusManager(this);
         afkManager = new AFKManager();
+        shardShopGUI = new ShardShopGUI(afkManager);
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("help");
@@ -140,6 +145,8 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Admin Command", "success");
         manager.registerCommand(new DonorCommand());
         Logger.INSTANCE.log("Loaded the Donor Command", "success");
+        manager.registerCommand(new ShardShopCommand(shardShopGUI));
+        Logger.INSTANCE.log("Loaded the ShardShop Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
@@ -161,6 +168,9 @@ public final class DupeJS extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new VanishListener(this), this);
         Logger.INSTANCE.log("Loaded the Vanish Listener", "success");
+
+        getServer().getPluginManager().registerEvents(new ShardShopListener(afkManager), this);
+        Logger.INSTANCE.log("Loaded the ShardShop Listener", "success");
 
         Logger.INSTANCE.log("Starting the AFK Reward Task", "info");
         if (afkRewardTask == null) {
