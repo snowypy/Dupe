@@ -25,8 +25,10 @@ import codes.snowy.dupeJS.tpa.TpaCancelCommand;
 import codes.snowy.dupeJS.tpa.TpaCommand;
 import codes.snowy.dupeJS.tpa.TpaDenyCommand;
 import codes.snowy.dupeJS.tpa.TpaHereCommand;
-import codes.snowy.dupeJS.utils.Language;
 import codes.snowy.dupeJS.utils.CommandCompletions;
+import codes.snowy.dupeJS.utils.Config;
+import codes.snowy.dupeJS.utils.Logger;
+import codes.snowy.dupeJS.utils.PlaceholderHandler;
 import codes.snowy.dupeJS.bundles.AdminBundleCommand;
 import codes.snowy.dupeJS.bundles.BundleListener;
 import codes.snowy.dupeJS.bundles.BundleManager;
@@ -51,11 +53,8 @@ import codes.snowy.dupeJS.kits.KitGUI;
 import codes.snowy.dupeJS.kits.KitListener;
 import codes.snowy.dupeJS.kits.KitManager;
 import codes.snowy.dupeJS.teleporter.TeleportManager;
-import codes.snowy.dupeJS.utils.Config;
 import codes.snowy.dupeJS.utils.Language;
-import codes.snowy.dupeJS.utils.Logger;
 import codes.snowy.dupeJS.staff.vanish.VanishCommand;
-import codes.snowy.dupeJS.utils.PlaceholderHandler;
 import codes.snowy.dupeJS.afk.AFKRewardTask;
 import codes.snowy.dupeJS.kits.KitCooldownManager;
 import org.bukkit.Bukkit;
@@ -81,6 +80,7 @@ public final class DupeJS extends JavaPlugin {
     KitManager kitManager;
     KitGUI kitGUI;
     private KitCooldownManager kitCooldownManager;
+    CommandCompletions commandCompletions;
 
     public static DupeJS getInstance() {
         return instance;
@@ -118,8 +118,13 @@ public final class DupeJS extends JavaPlugin {
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("help");
+        Logger.INSTANCE.log("Loaded the Command Manager", "success");
 
-        CommandCompletions.INSTANCE.register(manager);
+        Logger.INSTANCE.log("Loaded Command Completions", "success");
+        commandCompletions = new CommandCompletions(kitManager);
+
+        commandCompletions.register(manager);
+
         manager.registerCommand(new DupeCommand(dupeManager));
         Logger.INSTANCE.log("Loaded the Dupe Command", "success");
         manager.registerCommand(new DupeBlacklistCommand(dupeManager));
