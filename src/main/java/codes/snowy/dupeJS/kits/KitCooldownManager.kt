@@ -1,5 +1,6 @@
 package codes.snowy.dupeJS.kits
 
+import Kit
 import java.sql.Connection
 import java.sql.DriverManager
 import java.util.UUID
@@ -52,18 +53,18 @@ class KitCooldownManager {
         statement.close()
     }
 
-    fun canUseKit(player: UUID, kitName: String): Boolean {
+    fun canUseKit(player: UUID, kit: Kit): Boolean {
         val statement = dbConnection.prepareStatement("""
             SELECT last_used FROM kit_cooldowns
             WHERE player_uuid = ? AND kit_name = ?
         """)
         statement.setString(1, player.toString())
-        statement.setString(2, kitName.lowercase())
+        statement.setString(2, kit.name.lowercase())
         
         val result = statement.executeQuery()
         val canUse = if (result.next()) {
             val lastUsed = result.getLong("last_used")
-            System.currentTimeMillis() - lastUsed >= 24 * 60 * 60 * 1000
+            System.currentTimeMillis() - lastUsed >= kit.cooldownHours * 60 * 60 * 1000
         } else {
             true
         }
@@ -73,19 +74,19 @@ class KitCooldownManager {
         return canUse
     }
 
-    fun getRemainingCooldown(player: UUID, kitName: String): Long {
+    fun getRemainingCooldown(player: UUID, kit: Kit): Long {
         val statement = dbConnection.prepareStatement("""
             SELECT last_used FROM kit_cooldowns
             WHERE player_uuid = ? AND kit_name = ?
         """)
         statement.setString(1, player.toString())
-        statement.setString(2, kitName.lowercase())
+        statement.setString(2, kit.name.lowercase())
         
         val result = statement.executeQuery()
         val remaining = if (result.next()) {
             val lastUsed = result.getLong("last_used")
             val timePassed = System.currentTimeMillis() - lastUsed
-            val cooldown = 24 * 60 * 60 * 1000
+            val cooldown = kit.cooldownHours * 60 * 60 * 1000
             (cooldown - timePassed).coerceAtLeast(0)
         } else {
             0L
