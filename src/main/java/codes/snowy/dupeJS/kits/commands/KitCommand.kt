@@ -25,20 +25,20 @@ class KitCommand(
 
         val kit = kitManager.getKit(kitName)
         if (kit == null) {
-            player.sendMessage("&cThat kit doesn't exist!".translate())
+            player.sendMessage("&#feda36&lKITS &8| &#ff0000Kit not found.".translate())
             return
         }
 
         if (!player.hasPermission(kit.permission)) {
-            player.sendMessage("&cYou don't have permission to claim this kit!".translate())
+            player.sendMessage("&#feda36&lKITS &8| &#ff0000You don't have permission to claim this kit.".translate())
             return
         }
 
-        if (!cooldownManager.canUseKit(player.uniqueId, kit.name)) {
-            val remaining = cooldownManager.getRemainingCooldown(player.uniqueId, kit.name)
+        if (!cooldownManager.canUseKit(player.uniqueId, kit)) {
+            val remaining = cooldownManager.getRemainingCooldown(player.uniqueId, kit)
             val hours = remaining / (1000 * 60 * 60)
             val minutes = (remaining % (1000 * 60 * 60)) / (1000 * 60)
-            player.sendMessage("&cYou must wait &e${hours}h ${minutes}m &cbefore using this kit again!".translate())
+            player.sendMessage("&#feda36&lKITS &8| &#ff0000You must wait &#feda36&n${hours}h ${minutes}m&r &#ff0000before using this kit again.".translate())
             return
         }
 
@@ -46,6 +46,6 @@ class KitCommand(
             player.inventory.addItem(item.clone())
         }
         cooldownManager.setKitCooldown(player.uniqueId, kit.name)
-        player.sendMessage("&aYou have claimed the ${kit.name} kit!".translate())
+        player.sendMessage("&#10f08aYou have claimed the &#feda36${kit.name} &#10f08akit!".translate())
     }
 }
