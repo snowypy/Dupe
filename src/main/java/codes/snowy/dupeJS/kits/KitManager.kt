@@ -32,7 +32,8 @@ class KitManager {
                 name = kitName,
                 permission = section.getString("permission") ?: "dupe.kit.$kitName",
                 displayItem = section.getString("displayItem") ?: "CHEST",
-                items = section.getList("items")?.filterIsInstance<ItemStack>() ?: emptyList()
+                items = section.getList("items")?.filterIsInstance<ItemStack>() ?: emptyList(),
+                cooldownHours = section.getInt("cooldownHours", 24)
             )
             kits[kitName.lowercase()] = kit
         }
@@ -45,6 +46,7 @@ class KitManager {
         kitSection.set("permission", kit.permission)
         kitSection.set("displayItem", kit.displayItem)
         kitSection.set("items", kit.items)
+        kitSection.set("cooldownHours", kit.cooldownHours)
         
         config.save(configFile)
         kits[kit.name.lowercase()] = kit
