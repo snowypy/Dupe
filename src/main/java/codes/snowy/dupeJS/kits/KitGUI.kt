@@ -14,36 +14,36 @@ class KitGUI(
     fun openKitSelector(player: Player) {
         val kits = kitManager.getAllKits()
         val inventorySize = ((kits.size + 26) / 9) * 9
-        val inventory = Bukkit.createInventory(null, inventorySize, "&b&lKits".translate())
+        val inventory = Bukkit.createInventory(null, inventorySize, "&#feda36&lKITS".translate())
 
         kits.forEachIndexed { index, kit ->
             if (player.hasPermission(kit.permission)) {
-                val canUse = cooldownManager.canUseKit(player.uniqueId, kit.name)
+                val canUse = cooldownManager.canUseKit(player.uniqueId, kit)
                 val displayName = if (!canUse) {
-                    "${kit.name} &#FF0000(Cooldown)".translate()
+                    "&#ff0000&l${kit.name}".toUpperCase().translate()
                 } else {
-                    "&b${kit.name}".translate()
+                    "&#feda36&l${kit.name}".toUpperCase().translate()
                 }
 
                 val lore = if (!canUse) {
-                    val remaining = cooldownManager.getRemainingCooldown(player.uniqueId, kit.name)
+                    val remaining = cooldownManager.getRemainingCooldown(player.uniqueId, kit)
                     val hours = remaining / (1000 * 60 * 60)
                     val minutes = (remaining % (1000 * 60 * 60)) / (1000 * 60)
                     val timesClaimed = cooldownManager.getTimesClaimed(player.uniqueId, kit.name)
                     listOf(
                         "",
-                        "&#FF0000&l| &7Cooldown: ${hours}h ${minutes}m".translate(),
-                        "&#FF0000&l| &7Times Claimed: $timesClaimed".translate(),
+                        "&#feda36&l| &7Cooldown: &#FF0000${hours}h ${minutes}m".translate(),
+                        "&#feda36&l| &7Times Claimed: $timesClaimed".translate(),
                         "",
-                        "&7[Cannot Click]".translate()
+                        "&#ff0000[On Cooldown]".translate()
                     )
                 } else {
                     val timesClaimed = cooldownManager.getTimesClaimed(player.uniqueId, kit.name)
                     listOf(
                         "",
-                        "&#FF0000&l| &7Times Claimed: $timesClaimed".translate(),
+                        "&#feda36&l| &7Times Claimed: $timesClaimed".translate(),
                         "",
-                        "&7[Click to Claim]".translate()
+                        "&#10f08a[Click to Claim]".translate()
                     )
                 }
 
@@ -64,7 +64,7 @@ class KitGUI(
         val inventory = Bukkit.createInventory(
             null, 
             54, 
-            "&b&lKit Editor: ${kitName ?: "New Kit"}".translate()
+            "&#feda36&lKIT EDITOR: ${kitName ?: "New Kit"}".translate()
         )
         
         if (kitName != null) {
