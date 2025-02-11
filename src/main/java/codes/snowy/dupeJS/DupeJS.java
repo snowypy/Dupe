@@ -126,7 +126,7 @@ public final class DupeJS extends JavaPlugin {
         kitManager = new KitManager();
         kitCooldownManager = new KitCooldownManager();
         kitGUI = new KitGUI(kitManager, kitCooldownManager);
-        rewardSystem = new RewardSystem();
+        rewardSystem = new RewardSystem(this);
         missionDatabase = new MissionDatabase();
         missionManager = new MissionManager(missionDatabase);
         missionGUI = new MissionGUI(missionManager, rewardSystem);
