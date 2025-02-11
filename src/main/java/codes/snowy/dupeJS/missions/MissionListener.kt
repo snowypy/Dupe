@@ -30,7 +30,8 @@ class MissionListener(private val missionManager: MissionManager) : Listener {
 
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
-        missionManager.updateMissionProgress(event.player, "Break Blocks", 1)
+        val player = event.player
+        missionManager.updateMissionProgress(player, "Break Blocks", 1)
     }
 
     @EventHandler
