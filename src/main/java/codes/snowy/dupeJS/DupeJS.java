@@ -11,6 +11,13 @@ import codes.snowy.dupeJS.basic.StoreCommand;
 import codes.snowy.dupeJS.basic.SpawnCommand;
 import codes.snowy.dupeJS.basic.SetSpawnCommand;
 import codes.snowy.dupeJS.dupe.DupeRechargeCommand;
+import codes.snowy.dupeJS.missions.MissionManager;
+import codes.snowy.dupeJS.missions.MissionDatabase;
+import codes.snowy.dupeJS.missions.MissionGUI;
+import codes.snowy.dupeJS.missions.MissionGUIListener;
+import codes.snowy.dupeJS.missions.MissionListener;
+import codes.snowy.dupeJS.missions.RewardSystem;
+import codes.snowy.dupeJS.missions.commands.MissionCommand;
 import codes.snowy.dupeJS.session.SessionListener;
 import codes.snowy.dupeJS.shards.ShardShopCommand;
 import codes.snowy.dupeJS.shards.ShardShopGUI;
@@ -80,6 +87,10 @@ public final class DupeJS extends JavaPlugin {
     KitManager kitManager;
     KitGUI kitGUI;
     private KitCooldownManager kitCooldownManager;
+    MissionManager missionManager;
+    MissionGUI missionGUI;
+    RewardSystem rewardSystem;
+    MissionDatabase missionDatabase;
     CommandCompletions commandCompletions;
 
     public static DupeJS getInstance() {
@@ -115,6 +126,10 @@ public final class DupeJS extends JavaPlugin {
         kitManager = new KitManager();
         kitCooldownManager = new KitCooldownManager();
         kitGUI = new KitGUI(kitManager, kitCooldownManager);
+        rewardSystem = new RewardSystem();
+        missionDatabase = new MissionDatabase();
+        missionManager = new MissionManager(missionDatabase);
+        missionGUI = new MissionGUI(missionManager, rewardSystem);
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("help");
@@ -181,6 +196,8 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Kit Command", "success");
         manager.registerCommand(new KitEditorCommand(kitManager, kitGUI));
         Logger.INSTANCE.log("Loaded the Kit Editor Command", "success");
+        manager.registerCommand(new MissionCommand(missionManager, missionGUI, rewardSystem));
+        Logger.INSTANCE.log("Loaded the Mission Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
@@ -217,6 +234,12 @@ public final class DupeJS extends JavaPlugin {
         }
         afkRewardTask.startAFKTimer(this, afkManager);
         Logger.INSTANCE.log("AFK Reward Task has been started", "success");
+
+        getServer().getPluginManager().registerEvents(new MissionGUIListener(missionManager, rewardSystem), this);
+        Logger.INSTANCE.log("Loaded the MissionGUI Listener", "success");
+        
+        getServer().getPluginManager().registerEvents(new MissionListener(missionManager), this);
+        Logger.INSTANCE.log("Loaded the Mission Listener", "success");
 
     }
 
