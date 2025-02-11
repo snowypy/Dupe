@@ -6,8 +6,12 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import codes.snowy.dupeJS.DupeJS
 import codes.snowy.dupeJS.utils.translate
+import org.bukkit.Material
+import org.yaml.snakeyaml.Yaml
+import java.io.InputStream
+import java.io.File
 
-class RewardSystem {
+class RewardSystem(private val plugin: DupeJS) {
 
     fun spinRewardWheel(player: Player) {
         val inventory = Bukkit.createInventory(null, 27, "&#feda36&lSPINNING WHEEL".translate())
@@ -34,11 +38,26 @@ class RewardSystem {
     }
 
     private fun getRewardsFromConfig(): List<Reward> {
-        return listOf()
+        return loadRewardsConfig()
     }
 
     private fun executeRewardCommand(player: Player, command: String) {
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command.replace("%player%", player.name))
+    }
+
+    private fun loadRewardsConfig(): List<Reward> {
+        val file = File(plugin.dataFolder, "missions.yml")
+        if (!file.exists()) {
+            plugin.saveResource("missions.yml", false)
+        }
+        val inputStream: InputStream = file.inputStream()
+        val yaml = Yaml()
+        val data: Map<String, List<Map<String, Any>>> = yaml.load(inputStream)
+        return data["rewards"]?.map { rewardMap ->
+            val previewItemMap = rewardMap["previewItem"] as Map<String, Any>
+            val itemStack = ItemStack(Material.valueOf(previewItemMap["type"] as String), previewItemMap["amount"] as Int)
+            Reward(itemStack, rewardMap["command"] as String)
+        } ?: emptyList()
     }
 }
 
