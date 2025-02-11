@@ -10,6 +10,7 @@ import codes.snowy.dupeJS.missions.MissionManager
 import codes.snowy.dupeJS.missions.RewardSystem
 import codes.snowy.dupeJS.utils.translate
 import org.bukkit.entity.Player
+import java.sql.PreparedStatement
 
 @CommandAlias("mission")
 class MissionCommand(
@@ -42,5 +43,20 @@ class MissionCommand(
         } else {
             player.sendMessage("&#feda36&lMISSIONS &8| &#FF0000You have no completed missions to claim rewards.".translate())
         }
+    }
+
+    @Subcommand("refresh")
+    @Description("Refresh your missions")
+    fun onRefresh(player: Player) {
+
+        if (!player.hasPermission("dupe.admin")) {
+            player.sendMessage("&#feda36&lMISSIONS &8|   &#FF0000You can only refresh your missions as an admin.".translate())
+            return
+        }
+        missionManager.clearPlayerMissions(player)
+        missionManager.assignMissions(player, 2, "daily")
+        missionManager.assignMissions(player, 3, "weekly")
+
+        player.sendMessage("&#feda36&lMISSIONS &8| &#00FF00Your missions have been refreshed.".translate())
     }
 } 
