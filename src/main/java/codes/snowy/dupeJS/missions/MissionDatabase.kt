@@ -19,7 +19,7 @@ class MissionDatabase {
                 mission_type TEXT,
                 progress INT,
                 target INT,
-                last_updated BIGINT,
+                last_updated LONG,
                 PRIMARY KEY (player_uuid, mission_type)
             )
         """)
