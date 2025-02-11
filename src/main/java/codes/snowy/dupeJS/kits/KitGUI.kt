@@ -13,8 +13,15 @@ class KitGUI(
 
     fun openKitSelector(player: Player) {
         val kits = kitManager.getAllKits()
-        val inventorySize = ((kits.size + 26) / 9) * 9
+        val inventorySize = 27
         val inventory = Bukkit.createInventory(null, inventorySize, "&#feda36&lKITS".translate())
+
+        val middleRowStart = 9
+        val middleRowEnd = 17
+        val kitSlots = (middleRowStart..middleRowEnd).toList()
+
+        val totalKits = kits.size
+        val startSlot = (kitSlots.size - (totalKits * 2 - 1)) / 2
 
         kits.forEachIndexed { index, kit ->
             if (player.hasPermission(kit.permission)) {
@@ -53,7 +60,17 @@ class KitGUI(
                         this.lore = lore
                     }
                 }
-                inventory.setItem(index, displayItem)
+                inventory.setItem(kitSlots[startSlot + index * 2], displayItem)
+            }
+        }
+
+        for (i in 0 until inventory.size) {
+            if (inventory.getItem(i) == null) {
+                inventory.setItem(i, ItemStack(Material.GRAY_STAINED_GLASS_PANE).apply {
+                    itemMeta = itemMeta?.apply {
+                        setDisplayName(" ")
+                    }
+                })
             }
         }
 
