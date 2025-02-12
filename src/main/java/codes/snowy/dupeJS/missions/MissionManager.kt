@@ -81,7 +81,7 @@ class MissionManager(private val db: MissionDatabase) {
     private fun notifyMissionCompletion(player: Player, missionType: String) {
         player.sendMessage("&#feda36&lMISSIONS &8| &fYou finished your &#feda36&n${missionType}&f mission!".translate())
         player.playSound(player.location, Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f)
-        player.sendTitle("&#feda36&lMISSION COMPLETE", "&fYou finished your &#feda36&n${missionType}&f mission!", 10, 70, 20)
+        player.sendTitle("&#feda36&lMISSION COMPLETE".translate(), "&fYou finished your &#feda36&n${missionType}&f mission!".translate(), 10, 70, 20)
     }
 
     fun checkMissionCompletion(player: Player): Boolean {
