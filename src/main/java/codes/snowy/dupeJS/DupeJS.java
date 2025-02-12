@@ -65,6 +65,12 @@ import codes.snowy.dupeJS.utils.Language;
 import codes.snowy.dupeJS.staff.vanish.VanishCommand;
 import codes.snowy.dupeJS.afk.AFKRewardTask;
 import codes.snowy.dupeJS.kits.KitCooldownManager;
+import codes.snowy.dupeJS.warp.WarpCommand;
+import codes.snowy.dupeJS.warp.WarpDatabase;
+import codes.snowy.dupeJS.warp.WarpGUI;
+import codes.snowy.dupeJS.warp.WarpGUIListener;
+import codes.snowy.dupeJS.warp.WarpManager;
+import codes.snowy.dupeJS.warp.WarpAdminCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
@@ -93,6 +99,8 @@ public final class DupeJS extends JavaPlugin {
     RewardSystem rewardSystem;
     MissionDatabase missionDatabase;
     CommandCompletions commandCompletions;
+    WarpManager warpManager;
+    WarpDatabase warpDatabase;
 
     public static DupeJS getInstance() {
         return instance;
@@ -131,6 +139,9 @@ public final class DupeJS extends JavaPlugin {
         missionDatabase = new MissionDatabase();
         missionManager = new MissionManager(missionDatabase);
         missionGUI = new MissionGUI(missionManager, rewardSystem);
+        warpDatabase = new WarpDatabase();
+        warpManager = new WarpManager(warpDatabase);
+        WarpGUI warpGUI = new WarpGUI(warpManager, teleportManager);
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("help");
@@ -199,6 +210,10 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Kit Editor Command", "success");
         manager.registerCommand(new MissionCommand(missionManager, missionGUI, rewardSystem));
         Logger.INSTANCE.log("Loaded the Mission Command", "success");
+        manager.registerCommand(new WarpCommand(warpGUI));
+        Logger.INSTANCE.log("Loaded the Warp Command", "success");
+        manager.registerCommand(new WarpAdminCommand(warpDatabase));
+        Logger.INSTANCE.log("Loaded the WarpAdmin Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
@@ -242,6 +257,9 @@ public final class DupeJS extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new RewardSystemListener(), this);
         Logger.INSTANCE.log("Loaded the RewardSystem Listener", "success");
+
+        getServer().getPluginManager().registerEvents(new WarpGUIListener(warpManager, teleportManager), this);
+        Logger.INSTANCE.log("Loaded the WarpGUI Listener", "success");
 
     }
 
