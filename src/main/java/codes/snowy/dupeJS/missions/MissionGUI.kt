@@ -5,7 +5,9 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.Material
 import codes.snowy.dupeJS.utils.translate
+import de.tr7zw.changeme.nbtapi.NBTItem
 import java.util.concurrent.TimeUnit
+import org.bukkit.inventory.meta.ItemMeta
 
 class MissionGUI(private val missionManager: MissionManager, private val rewardSystem: RewardSystem) {
 
@@ -32,8 +34,16 @@ class MissionGUI(private val missionManager: MissionManager, private val rewardS
 
         missions.forEachIndexed { index, mission ->
             val isComplete = mission.progress >= mission.target
-            val statusColor = if (isComplete) "&#5fff33&n" else "&7&n"
-            val statusText = if (isComplete) "&7[CLICK TO CLAIM]" else "&#ff0000[CANNOT CLAIM]"
+            val statusColor = when {
+                mission.claimed -> "&#ff0000&n"
+                isComplete -> "&#5fff33&n"
+                else -> "&7&n"
+            }
+            val statusText = when {
+                mission.claimed -> "&7[ALREADY CLAIMED]"
+                isComplete -> "&7[CLICK TO CLAIM]"
+                else -> "&#ff0000[CANNOT CLAIM]"
+            }
             val frequencyColor = if (mission.frequency == "daily") "&#33e1ff" else "&#ff9433"
             val frequencyText = if (mission.frequency == "daily") "[DAILY]" else "[WEEKLY]"
 
@@ -50,7 +60,9 @@ class MissionGUI(private val missionManager: MissionManager, private val rewardS
                     )
                 }
             }
-            inventory.setItem(missionSlots[startSlot + index], missionItem)
+            val nbtItem = NBTItem(missionItem)
+            nbtItem.setString("missionUUID", mission.missionUUID.toString())
+            inventory.setItem(missionSlots[startSlot + index], nbtItem.item)
         }
 
         player.openInventory(inventory)
