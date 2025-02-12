@@ -67,12 +67,23 @@ class RewardSystem(private val plugin: DupeJS) {
         }
         val inputStream: InputStream = file.inputStream()
         val yaml = Yaml()
-        val data: Map<String, List<Map<String, Any>>> = yaml.load(inputStream)
-        return data["rewards"]?.map { rewardMap ->
-            val previewItemMap = rewardMap["previewItem"] as Map<String, Any>
-            val itemStack = ItemStack(Material.valueOf(previewItemMap["type"] as String), previewItemMap["amount"] as Int)
-            Reward(itemStack, rewardMap["command"] as String)
-        } ?: emptyList()
+        val data: Map<String, Any> = yaml.load(inputStream)
+
+
+        val missionsSection = data["missions"] as? Map<String, Any> ?: return emptyList()
+        val itemsSection = missionsSection["items"] as? Map<String, Map<String, Any>> ?: return emptyList()
+
+        return itemsSection.map { (_, itemData) ->
+            val material = Material.valueOf(itemData["material"] as String)
+            val itemStack = ItemStack(material)
+            val itemMeta = itemStack.itemMeta
+            itemMeta?.setDisplayName((itemData["displayName"] as String).translate())
+            itemMeta?.lore = (itemData["lore"] as List<String>).map { it.translate() }
+            itemStack.itemMeta = itemMeta
+
+            val commands = itemData["commands"] as List<String>
+            Reward(itemStack, commands.joinToString(";"))
+        }
     }
 }
 
