@@ -40,6 +40,7 @@ class MissionCommand(
         missionManager.ensureMissionsAssigned(player)
         if (missionManager.checkMissionCompletion(player)) {
             rewardSystem.spinRewardWheel(player)
+            missionManager.markMissionsAsClaimed(player)
         } else {
             player.sendMessage("&#feda36&lMISSIONS &8| &#FF0000You have no completed missions to claim rewards.".translate())
         }
