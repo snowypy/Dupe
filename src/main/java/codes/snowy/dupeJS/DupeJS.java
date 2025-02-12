@@ -11,12 +11,13 @@ import codes.snowy.dupeJS.basic.StoreCommand;
 import codes.snowy.dupeJS.basic.SpawnCommand;
 import codes.snowy.dupeJS.basic.SetSpawnCommand;
 import codes.snowy.dupeJS.dupe.DupeRechargeCommand;
+import codes.snowy.dupeJS.missions.MissionGUIListener;
 import codes.snowy.dupeJS.missions.MissionManager;
 import codes.snowy.dupeJS.missions.MissionDatabase;
 import codes.snowy.dupeJS.missions.MissionGUI;
-import codes.snowy.dupeJS.missions.MissionGUIListener;
-import codes.snowy.dupeJS.missions.MissionListener;
 import codes.snowy.dupeJS.missions.RewardSystem;
+import codes.snowy.dupeJS.missions.RewardSystemListener;
+import codes.snowy.dupeJS.missions.MissionListener;
 import codes.snowy.dupeJS.missions.commands.MissionCommand;
 import codes.snowy.dupeJS.session.SessionListener;
 import codes.snowy.dupeJS.shards.ShardShopCommand;
@@ -226,9 +227,7 @@ public final class DupeJS extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new KitListener(kitManager, kitCooldownManager), this);
         Logger.INSTANCE.log("Loaded the Kit Listener", "success");
 
-        Logger.INSTANCE.log("Starting the AFK Reward Task", "info");
         if (afkRewardTask == null) {
-            Logger.INSTANCE.log("AFK Reward Task has not been initialized", "warning");
             afkRewardTask = new AFKRewardTask(this, afkManager);
             Logger.INSTANCE.log("AFK Reward Task has been initialized", "success");
         }
@@ -240,6 +239,9 @@ public final class DupeJS extends JavaPlugin {
         
         getServer().getPluginManager().registerEvents(new MissionListener(missionManager), this);
         Logger.INSTANCE.log("Loaded the Mission Listener", "success");
+
+        getServer().getPluginManager().registerEvents(new RewardSystemListener(), this);
+        Logger.INSTANCE.log("Loaded the RewardSystem Listener", "success");
 
     }
 
