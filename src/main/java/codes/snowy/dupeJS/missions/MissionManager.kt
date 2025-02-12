@@ -1,6 +1,8 @@
 package codes.snowy.dupeJS.missions
 
+import codes.snowy.dupeJS.utils.translate
 import org.bukkit.Bukkit
+import org.bukkit.Sound
 import org.bukkit.entity.Player
 import java.sql.Connection
 import java.sql.DriverManager
@@ -23,14 +25,16 @@ class MissionManager(private val db: MissionDatabase) {
         )
 
         missions.forEach { mission ->
+            val missionUUID = UUID.randomUUID().toString()
             val statement: PreparedStatement = dbConnection.prepareStatement("""
-                INSERT OR REPLACE INTO player_missions (player_uuid, mission_type, progress, target, last_updated)
-                VALUES (?, ?, 0, ?, ?)
+                INSERT OR REPLACE INTO player_missions (player_uuid, mission_uuid, mission_type, progress, target, last_updated, claimed)
+                VALUES (?, ?, ?, 0, ?, ?, 0)
             """)
             statement.setString(1, playerUUID.toString())
-            statement.setString(2, mission)
-            statement.setInt(3, extractTarget(mission))
-            statement.setLong(4, System.currentTimeMillis())
+            statement.setString(2, missionUUID)
+            statement.setString(3, mission)
+            statement.setInt(4, extractTarget(mission))
+            statement.setLong(5, System.currentTimeMillis())
             statement.executeUpdate()
             statement.close()
         }
@@ -39,23 +43,52 @@ class MissionManager(private val db: MissionDatabase) {
     fun updateMissionProgress(player: Player, missionType: String, progress: Int) {
         val playerUUID = player.uniqueId
         Bukkit.getLogger().info("Updating mission progress for player: ${player.name}, missionType: $missionType, progress: $progress")
-        val statement: PreparedStatement = dbConnection.prepareStatement("""
-            UPDATE player_missions
-            SET progress = progress + ?
+
+        val selectStatement: PreparedStatement = dbConnection.prepareStatement("""
+            SELECT mission_uuid, progress, target FROM player_missions
             WHERE player_uuid = ? AND mission_type = ?
         """)
-        statement.setInt(1, progress)
-        statement.setString(2, playerUUID.toString())
-        statement.setString(3, missionType)
-        statement.executeUpdate()
-        statement.close()
+        selectStatement.setString(1, playerUUID.toString())
+        selectStatement.setString(2, missionType)
+        val resultSet: ResultSet = selectStatement.executeQuery()
+
+        while (resultSet.next()) {
+            val missionUUID = resultSet.getString("mission_uuid")
+            val currentProgress = resultSet.getInt("progress")
+            val target = resultSet.getInt("target")
+            val newProgress = (currentProgress + progress).coerceAtMost(target)
+
+            val updateStatement: PreparedStatement = dbConnection.prepareStatement("""
+                UPDATE player_missions
+                SET progress = ?
+                WHERE player_uuid = ? AND mission_uuid = ?
+            """)
+            updateStatement.setInt(1, newProgress)
+            updateStatement.setString(2, playerUUID.toString())
+            updateStatement.setString(3, missionUUID)
+            updateStatement.executeUpdate()
+            updateStatement.close()
+
+            if (newProgress >= target && currentProgress < target) {
+                notifyMissionCompletion(player, missionType)
+            }
+        }
+
+        resultSet.close()
+        selectStatement.close()
+    }
+
+    private fun notifyMissionCompletion(player: Player, missionType: String) {
+        player.sendMessage("&#feda36&lMISSIONS &8| &fYou finished your &#feda36&n${missionType}&f mission!".translate())
+        player.playSound(player.location, Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f)
+        player.sendTitle("&#feda36&lMISSION COMPLETE", "&fYou finished your &#feda36&n${missionType}&f mission!", 10, 70, 20)
     }
 
     fun checkMissionCompletion(player: Player): Boolean {
         val playerUUID = player.uniqueId
         val statement: PreparedStatement = dbConnection.prepareStatement("""
-            SELECT progress, target FROM player_missions
-            WHERE player_uuid = ?
+            SELECT progress, target, claimed FROM player_missions
+            WHERE player_uuid = ? AND claimed = 0
         """)
         statement.setString(1, playerUUID.toString())
         val resultSet: ResultSet = statement.executeQuery()
@@ -97,19 +130,21 @@ class MissionManager(private val db: MissionDatabase) {
         val playerUUID = player.uniqueId
         val missions = mutableListOf<Mission>()
         val statement: PreparedStatement = dbConnection.prepareStatement("""
-            SELECT mission_type, progress, target, last_updated FROM player_missions
+            SELECT mission_uuid, mission_type, progress, target, last_updated, claimed FROM player_missions
             WHERE player_uuid = ?
         """)
         statement.setString(1, playerUUID.toString())
         val resultSet: ResultSet = statement.executeQuery()
         while (resultSet.next()) {
             val mission = Mission(
+                missionUUID = UUID.fromString(resultSet.getString("mission_uuid")),
                 type = resultSet.getString("mission_type"),
                 missionType = resultSet.getString("mission_type"),
                 progress = resultSet.getInt("progress"),
                 target = resultSet.getInt("target"),
                 lastUpdated = resultSet.getLong("last_updated"),
-                frequency = determineFrequency(resultSet.getString("mission_type"))
+                frequency = determineFrequency(resultSet.getString("mission_type")),
+                claimed = resultSet.getBoolean("claimed")
             )
             missions.add(mission)
         }
@@ -151,14 +186,16 @@ class MissionManager(private val db: MissionDatabase) {
         }
 
         missions.forEach { (mission, missionType) ->
+            val missionUUID = UUID.randomUUID().toString()
             val statement: PreparedStatement = dbConnection.prepareStatement("""
-                INSERT OR REPLACE INTO player_missions (player_uuid, mission_type, progress, target, last_updated)
-                VALUES (?, ?, 0, ?, ?)
+                INSERT OR REPLACE INTO player_missions (player_uuid, mission_uuid, mission_type, progress, target, last_updated, claimed)
+                VALUES (?, ?, ?, 0, ?, ?, 0)
             """)
             statement.setString(1, playerUUID.toString())
-            statement.setString(2, missionType)
-            statement.setInt(3, extractTarget(mission))
-            statement.setLong(4, System.currentTimeMillis())
+            statement.setString(2, missionUUID)
+            statement.setString(3, missionType)
+            statement.setInt(4, extractTarget(mission))
+            statement.setLong(5, System.currentTimeMillis())
             statement.executeUpdate()
             statement.close()
         }
@@ -178,6 +215,46 @@ class MissionManager(private val db: MissionDatabase) {
             DELETE FROM player_missions WHERE player_uuid = ?
         """)
         statement.setString(1, playerUUID.toString())
+        statement.executeUpdate()
+        statement.close()
+    }
+
+    fun markMissionsAsClaimed(player: Player) {
+        val playerUUID = player.uniqueId
+        val statement: PreparedStatement = dbConnection.prepareStatement("""
+            UPDATE player_missions
+            SET claimed = 1
+            WHERE player_uuid = ? AND progress >= target
+        """)
+        statement.setString(1, playerUUID.toString())
+        statement.executeUpdate()
+        statement.close()
+    }
+
+    fun isMissionClaimed(player: Player, missionUUID: String): Boolean {
+        val playerUUID = player.uniqueId
+        val statement: PreparedStatement = dbConnection.prepareStatement("""
+            SELECT claimed FROM player_missions
+            WHERE player_uuid = ? AND mission_uuid = ?
+        """)
+        statement.setString(1, playerUUID.toString())
+        statement.setString(2, missionUUID)
+        val resultSet: ResultSet = statement.executeQuery()
+        val claimed = resultSet.next() && resultSet.getBoolean("claimed")
+        resultSet.close()
+        statement.close()
+        return claimed
+    }
+
+    fun markMissionAsClaimed(player: Player, missionUUID: String) {
+        val playerUUID = player.uniqueId
+        val statement: PreparedStatement = dbConnection.prepareStatement("""
+            UPDATE player_missions
+            SET claimed = 1
+            WHERE player_uuid = ? AND mission_uuid = ?
+        """)
+        statement.setString(1, playerUUID.toString())
+        statement.setString(2, missionUUID)
         statement.executeUpdate()
         statement.close()
     }
