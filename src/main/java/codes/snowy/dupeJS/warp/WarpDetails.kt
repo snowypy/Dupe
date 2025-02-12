@@ -1,0 +1,1 @@
+data class WarpDetails(val name: String, val previewItem: String, val displayName: String)
