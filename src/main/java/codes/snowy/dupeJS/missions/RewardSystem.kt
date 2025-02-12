@@ -17,6 +17,23 @@ class RewardSystem(private val plugin: DupeJS) {
         val inventory = Bukkit.createInventory(null, 27, "&#feda36&lSPINNING WHEEL".translate())
         player.openInventory(inventory)
 
+        val orangePane = ItemStack(Material.ORANGE_STAINED_GLASS_PANE).apply {
+            itemMeta = itemMeta?.apply {
+                setDisplayName(" ")
+            }
+        }
+        val yellowPane = ItemStack(Material.YELLOW_STAINED_GLASS_PANE).apply {
+            itemMeta = itemMeta?.apply {
+                setDisplayName(" ")
+            }
+        }
+
+        for (i in 0 until inventory.size) {
+            if (i != 13) {
+                inventory.setItem(i, if (i % 2 == 0) orangePane else yellowPane)
+            }
+        }
+
         object : BukkitRunnable() {
             var ticks = 0
 
@@ -28,9 +45,7 @@ class RewardSystem(private val plugin: DupeJS) {
                     executeRewardCommand(player, selectedReward.command)
                     cancel()
                 } else {
-                    for (i in 0 until inventory.size) {
-                        inventory.setItem(i, getRewardsFromConfig().random().previewItem)
-                    }
+                    inventory.setItem(13, getRewardsFromConfig().random().previewItem)
                     ticks++
                 }
             }
