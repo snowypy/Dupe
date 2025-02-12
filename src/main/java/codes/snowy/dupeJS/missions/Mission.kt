@@ -1,14 +1,17 @@
 package codes.snowy.dupeJS.missions
 
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 data class Mission(
+    val missionUUID: UUID,
     val type: String,
     val missionType: String,
     val progress: Int,
     val target: Int,
     val lastUpdated: Long,
-    val frequency: String
+    val frequency: String,
+    val claimed: Boolean
 ) {
     fun timeLeft(): String {
         val currentTime = System.currentTimeMillis()
