@@ -4,12 +4,9 @@ import co.aikar.commands.PaperCommandManager;
 import codes.snowy.dupeJS.adminutils.commands.AdminCommand;
 import codes.snowy.dupeJS.adminutils.commands.HealCommand;
 import codes.snowy.dupeJS.afk.AFKAdminCommand;
+import codes.snowy.dupeJS.afk.AFKCommand;
 import codes.snowy.dupeJS.afk.AFKManager;
-import codes.snowy.dupeJS.basic.DonorCommand;
-import codes.snowy.dupeJS.basic.DiscordCommand;
-import codes.snowy.dupeJS.basic.StoreCommand;
-import codes.snowy.dupeJS.basic.SpawnCommand;
-import codes.snowy.dupeJS.basic.SetSpawnCommand;
+import codes.snowy.dupeJS.basic.*;
 import codes.snowy.dupeJS.dupe.DupeRechargeCommand;
 import codes.snowy.dupeJS.missions.MissionGUIListener;
 import codes.snowy.dupeJS.missions.MissionManager;
@@ -214,6 +211,10 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Warp Command", "success");
         manager.registerCommand(new WarpAdminCommand(warpDatabase));
         Logger.INSTANCE.log("Loaded the WarpAdmin Command", "success");
+        manager.registerCommand(new AFKCommand(warpManager, teleportManager));
+        Logger.INSTANCE.log("Loaded the AFK Command", "success");
+        manager.registerCommand(new KoTHCommand(warpManager, teleportManager));
+        Logger.INSTANCE.log("Loaded the KoTH Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
