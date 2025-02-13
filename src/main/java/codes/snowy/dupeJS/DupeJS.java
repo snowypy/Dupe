@@ -215,6 +215,8 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the AFK Command", "success");
         manager.registerCommand(new KoTHCommand(warpManager, teleportManager));
         Logger.INSTANCE.log("Loaded the KoTH Command", "success");
+        manager.registerCommand(new codes.snowy.dupeJS.store.StoreCommand());
+        Logger.INSTANCE.log("Loaded the Store Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
