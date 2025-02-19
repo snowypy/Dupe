@@ -8,6 +8,8 @@ import codes.snowy.dupeJS.afk.AFKCommand;
 import codes.snowy.dupeJS.afk.AFKManager;
 import codes.snowy.dupeJS.basic.*;
 import codes.snowy.dupeJS.dupe.DupeRechargeCommand;
+import codes.snowy.dupeJS.economy.DupeyEconomy;
+import codes.snowy.dupeJS.economy.EconomyCommand;
 import codes.snowy.dupeJS.missions.MissionGUIListener;
 import codes.snowy.dupeJS.missions.MissionManager;
 import codes.snowy.dupeJS.missions.MissionDatabase;
@@ -71,6 +73,9 @@ import codes.snowy.dupeJS.warp.WarpAdminCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
+import net.milkbowl.vault.economy.Economy;
+import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.ServicePriority;
 
 public final class DupeJS extends JavaPlugin {
 
@@ -145,9 +150,11 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Command Manager", "success");
 
         Logger.INSTANCE.log("Loaded Command Completions", "success");
-        commandCompletions = new CommandCompletions(kitManager);
+        commandCompletions = new CommandCompletions(kitManager, warpManager);
 
         commandCompletions.register(manager);
+
+        DupeyEconomy.register();
 
         manager.registerCommand(new DupeCommand(dupeManager));
         Logger.INSTANCE.log("Loaded the Dupe Command", "success");
@@ -207,7 +214,7 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Kit Editor Command", "success");
         manager.registerCommand(new MissionCommand(missionManager, missionGUI, rewardSystem));
         Logger.INSTANCE.log("Loaded the Mission Command", "success");
-        manager.registerCommand(new WarpCommand(warpGUI));
+        manager.registerCommand(new WarpCommand(warpGUI, warpManager, teleportManager));
         Logger.INSTANCE.log("Loaded the Warp Command", "success");
         manager.registerCommand(new WarpAdminCommand(warpDatabase));
         Logger.INSTANCE.log("Loaded the WarpAdmin Command", "success");
@@ -217,6 +224,8 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the KoTH Command", "success");
         manager.registerCommand(new codes.snowy.dupeJS.store.StoreCommand());
         Logger.INSTANCE.log("Loaded the Store Command", "success");
+        manager.registerCommand(new EconomyCommand());
+        Logger.INSTANCE.log("Loaded the Economy Command", "success");
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
