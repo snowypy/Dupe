@@ -8,7 +8,7 @@ import org.bukkit.entity.Player
 import codes.snowy.dupeJS.utils.translate
 import codes.snowy.dupeJS.kits.KitCooldownManager
 
-@CommandAlias("kit")
+@CommandAlias("kit|kits|ekit|ekits")
 class KitCommand(
     private val kitManager: KitManager, 
     private val kitGUI: KitGUI,
