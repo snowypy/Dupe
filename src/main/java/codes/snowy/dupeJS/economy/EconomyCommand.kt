@@ -35,7 +35,7 @@ class EconomyCommand : BaseCommand() {
 
         val result = VaultHook.deposit(target, amount)
         if (result.isEmpty()) {
-            sender.sendMessage("&#00FF00&lSUCCESS &8| &fAdded &#00FF00$${convertCompact(amount)} &7[$${amount.toInt()}]&f to ${target.name}'s balance.".translate())
+            sender.sendMessage("&#00FF00&lSUCCESS &8| &fAdded &#00FF00$${convertCompact(amount.toLong())} &7[$${amount.toLong().toString().replace(".0", "")}]&f to ${target.name}'s balance.".translate())
         } else {
             sender.sendMessage("&#FF0000&lERROR &8| &fCouldn't add the money: $result".translate())
         }
@@ -59,7 +59,7 @@ class EconomyCommand : BaseCommand() {
 
         val result = VaultHook.withdraw(target, amount)
         if (result.isEmpty()) {
-            sender.sendMessage("&#00FF00&lSUCCESS &8| &fTook &#00FF00$${convertCompact(amount)} &7[$${amount.toInt()}]&f from $playerName".translate())
+            sender.sendMessage("&#00FF00&lSUCCESS &8| &fTook &#00FF00$${convertCompact(amount.toLong())} &7[$${amount.toLong().toString().replace(".0", "")}]&f from $playerName".translate())
         } else {
             sender.sendMessage("&#FF0000&lERROR &8| &fCouldn't take the money: $result".translate())
         }
