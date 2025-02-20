@@ -33,6 +33,6 @@ class BalanceCommand : BaseCommand() {
         }
 
         val balance = VaultHook.getBalance(target)
-        sender.sendMessage("&#00FF00&lBALANCE &8| &f${target.name}'s balance is &#00FF00$${convertCompact(balance)} &7[$${balance}]".translate())
+        sender.sendMessage("&#00FF00&lBALANCE &8| &f${target.name}'s balance is &#00FF00$${convertCompact(balance.toLong())} &7[$${balance.toLong().toString().replace(".0", "")}]".translate())
     }
 } 
