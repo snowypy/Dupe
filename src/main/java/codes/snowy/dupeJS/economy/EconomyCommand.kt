@@ -7,7 +7,8 @@ import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
-@CommandAlias("economy")
+@CommandAlias("economy|eco|money")
+@CommandPermission("dupe.admin")
 class EconomyCommand : BaseCommand() {
 
     @HelpCommand
@@ -15,8 +16,9 @@ class EconomyCommand : BaseCommand() {
         help.showHelp()
     }
 
-    @Subcommand("add")
+    @Subcommand("give")
     @Syntax("<player> <amount>")
+    @CommandCompletion("@players 1|10|100|1000|10000|100000|1000000|10000000|100000000|1000000000")
     @Description("Add money to a player's account")
     fun addMoney(sender: CommandSender, playerName: String, amount: Double) {
         val target = Bukkit.getPlayerExact(playerName)
@@ -32,14 +34,15 @@ class EconomyCommand : BaseCommand() {
 
         val result = VaultHook.deposit(target, amount)
         if (result.isEmpty()) {
-            sender.sendMessage("&#00FF00&lSUCCESS &8| &fGave ${target.name} a value of &#00FF00&n$${amount.toInt()}".translate())
+            sender.sendMessage("&#00FF00&lSUCCESS &8| &fAdded &#00FF00&n$${amount.toInt()}&f to ${target.name}'s balance.".translate())
         } else {
             sender.sendMessage("&#FF0000&lERROR &8| &fCouldn't add the money: $result".translate())
         }
     }
 
-    @Subcommand("remove")
+    @Subcommand("take")
     @Syntax("<player> <amount>")
+    @CommandCompletion("@players 1|10|100|1000|10000|100000|1000000|10000000|100000000|1000000000")
     @Description("Remove money from a player's account")
     fun removeMoney(sender: CommandSender, playerName: String, amount: Double) {
         val target = Bukkit.getPlayerExact(playerName)
