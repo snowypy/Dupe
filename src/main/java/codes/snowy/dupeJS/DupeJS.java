@@ -11,6 +11,7 @@ import codes.snowy.dupeJS.dupe.DupeRechargeCommand;
 import codes.snowy.dupeJS.economy.DupeyEconomy;
 import codes.snowy.dupeJS.economy.EconomyCommand;
 import codes.snowy.dupeJS.economy.PayCommand;
+import codes.snowy.dupeJS.economy.BalanceCommand;
 import codes.snowy.dupeJS.missions.MissionGUIListener;
 import codes.snowy.dupeJS.missions.MissionManager;
 import codes.snowy.dupeJS.missions.MissionDatabase;
@@ -242,6 +243,8 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Economy Command", "success");
         manager.registerCommand(new PayCommand());
         Logger.INSTANCE.log("Loaded the Pay Command", "success");
+        manager.registerCommand(new BalanceCommand());
+        Logger.INSTANCE.log("Loaded the Balance Command", "success");
 
 
         /*
