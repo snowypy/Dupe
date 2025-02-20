@@ -5,6 +5,7 @@ import co.aikar.commands.annotation.CommandAlias
 import co.aikar.commands.annotation.Default
 import codes.snowy.dupeJS.utils.translate
 import net.md_5.bungee.api.chat.ClickEvent
+import net.md_5.bungee.api.chat.ComponentBuilder
 import net.md_5.bungee.api.chat.HoverEvent
 import net.md_5.bungee.api.chat.TextComponent
 import org.bukkit.Sound
@@ -15,21 +16,24 @@ import org.bukkit.entity.Player
 class StoreCommand: BaseCommand() {
 
     @Default
-    fun onStoreCommand(sender: CommandSender) {
-        sender.sendMessage("&#6bf52f&l|".translate())
-        sender.sendMessage("&#6bf52f&l| SERVER STORE".translate())
-        sender.sendMessage("&#6bf52f&l| &fPurchase from our store to get stacked faster!".translate())
+    fun onDiscordCommand(sender: CommandSender) {
+        sender.sendMessage("&#bc28fd§m------------------------------------------".translate())
+        sender.sendMessage("&e".translate())
+        sender.sendMessage("&#bc28fd§lSERVER STORE".translate())
+        sender.sendMessage("&d".translate())
+        sender.sendMessage("&fSupport devs by buying &#bc28fdRanks & Recharges".translate())
+        sender.sendMessage("&c".translate())
 
-        val discordLink = TextComponent("§x§6§B§F§5§2§F&l| §x§6§B§F§5§2§F&nhttps://store.dupeystealy.com".translate())
-        discordLink.clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, "https://store.dupeystealy.com")
-        discordLink.hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("&#6bf52f&nClick to browse!".translate()))
+        val discordLink = TextComponent("&7[Click to Open]".translate())
+        discordLink.clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, "https://store.dupeystealy.xyz")
+        discordLink.hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("&#bc28fd&nClick to visit!".translate()))
         sender.spigot().sendMessage(discordLink)
 
-        sender.sendMessage("&#6bf52f&l|".translate())
+        sender.sendMessage("&l".translate())
+        sender.sendMessage("&#bc28fd&m------------------------------------------".translate())
 
         if (sender is Player) {
             sender.playSound(sender.location, Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f)
         }
     }
-
 }
