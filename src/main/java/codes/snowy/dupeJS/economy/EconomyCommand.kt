@@ -2,11 +2,13 @@ package codes.snowy.dupeJS.economy
 
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
+import codes.snowy.dupeJS.DupeJS
 import codes.snowy.dupeJS.utils.NumberConverter.convertCompact
 import codes.snowy.dupeJS.utils.translate
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import kotlin.random.Random
 
 @CommandAlias("economy|eco|money")
 @CommandPermission("dupe.admin")
@@ -39,6 +41,44 @@ class EconomyCommand : BaseCommand() {
         } else {
             sender.sendMessage("&#FF0000&lERROR &8| &fCouldn't add the money: $result".translate())
         }
+    }
+
+    @Subcommand("givepouch")
+    @Syntax("<player> <size>")
+    @CommandCompletion("@players small|medium|sizeable|huge")
+    @Description("Gives a money pouch to a player.")
+    fun givePouch(sender: CommandSender, playerName: String, size: String) {
+        val target = Bukkit.getPlayerExact(playerName)
+        if (target == null) {
+            sender.sendMessage("&#FF0000&lERROR &8| &fCouldn't find a player by the name &#ff0000&n$playerName".translate())
+            return
+        }
+
+        val amount = when (size.toLowerCase()) {
+            "small" -> Random.nextInt(25000, 100000)
+            "medium" -> Random.nextInt(75000, 255000)
+            "sizeable" -> Random.nextInt(235000, 465000)
+            "huge" -> Random.nextInt(450000, 1000000)
+            else -> {
+                sender.sendMessage("&#FF0000&lERROR &8| &fInvalid pouch size specified.".translate())
+                return
+            }
+        }
+
+        VaultHook.deposit(target, amount.toDouble())
+        
+        target.sendTitle("&6&lOPENING...".translate(), "&fYou are opening a $size money pouch!".translate(), 10, 70, 20)
+        target.playSound(target.location, "entity.firework.blast", 1f, 1f)
+        Bukkit.getScheduler().runTaskLater(DupeJS.getInstance(), object : Runnable {
+            override fun run() {
+                target.sendTitle("&6&lOPENED".translate(), "&fYou found a whopping &#00FF00&n$${convertCompact(amount.toLong())}".translate(), 10, 70, 20)
+            target.sendMessage("&#00FF00&lSUCCESS &8| &fYou opened a $size money pouch with &#00FF00&n${convertCompact(amount.toLong())}&f in it".translate())
+                target.playSound(target.location, "entity.firework.blast", 1f, 1f)
+            }
+        }, 60L)
+
+        sender.sendMessage("&#00FF00&lSUCCESS &8| &fYou gave ${target.name} a $size money pouch with &#00FF00&n${convertCompact(amount.toLong())}&f in it!".translate())
+        
     }
 
     @Subcommand("take")
