@@ -3,6 +3,7 @@ package codes.snowy.dupeJS.utils
 import codes.snowy.dupeJS.DupeJS
 import codes.snowy.dupeJS.dupe.DupeManager
 import codes.snowy.dupeJS.economy.VaultHook
+import codes.snowy.dupeJS.utils.NumberConverter.convertCompact
 import me.clip.placeholderapi.expansion.PlaceholderExpansion
 import org.bukkit.entity.Player
 
@@ -37,8 +38,12 @@ class PlaceholderHandler(plugin: DupeJS) : PlaceholderExpansion() {
             val rechargeTime = dupeManager.getRechargeTime(player).toString()
             return rechargeTime
         } else if (params.equals("balance-raw", ignoreCase = true)) {
-            val balanceRaw = VaultHook.getBalance(player).toInt().toString()
+            val balanceRaw = VaultHook.getBalance(player).toLong().toString().replace(".0", "")
             return balanceRaw
+        } else if (params.equals("balance-short", ignoreCase = true)) {
+            val balance = VaultHook.getBalance(player)
+            val formatted = convertCompact(balance.toLong())
+            return formatted
         }
         return "&cInvalid placeholder.".translate()
     }
