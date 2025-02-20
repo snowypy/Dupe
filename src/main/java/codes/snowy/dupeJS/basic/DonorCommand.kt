@@ -2,6 +2,7 @@ package codes.snowy.dupeJS.basic
 
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.CommandAlias
+import co.aikar.commands.annotation.CommandPermission
 import co.aikar.commands.annotation.Default
 import codes.snowy.dupeJS.DupeJS
 import codes.snowy.dupeJS.teleporter.TeleportManager
@@ -11,6 +12,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 @CommandAlias("donor")
+@CommandPermission("dupe.donator")
 class DonorCommand : BaseCommand() {
 
     private val dbHelper = DatabaseHelper()

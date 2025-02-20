@@ -14,9 +14,9 @@ class AFKCommand(private val warpManager: WarpManager, private val teleportManag
 
     @Default
     fun onAfkCommand(player: CommandSender) {
-        warpManager.getWarpLocation("afk")?.let {
-            warpManager.incrementVisitCount("afk")
-            teleportManager.teleportPlayer(player as Player, it, "afk")
+        warpManager.getWarpLocation("AFK")?.let {
+            warpManager.incrementVisitCount("AFK")
+            teleportManager.teleportPlayer(player as Player, it, "AFK")
             return
         }
 

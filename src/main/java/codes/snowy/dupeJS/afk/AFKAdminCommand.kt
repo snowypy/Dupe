@@ -1,16 +1,13 @@
 package codes.snowy.dupeJS.afk
 
 import co.aikar.commands.BaseCommand
-import co.aikar.commands.annotation.CommandAlias
-import co.aikar.commands.annotation.Default
-import co.aikar.commands.annotation.Description
-import co.aikar.commands.annotation.Optional
-import co.aikar.commands.annotation.Subcommand
+import co.aikar.commands.annotation.*
 import codes.snowy.dupeJS.afk.AFKManager
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 @CommandAlias("adminafk")
+@CommandPermission("dupe.adminafk")
 class AFKAdminCommand(private val afkManager: AFKManager) : BaseCommand() {
 
     @Subcommand("settimer")

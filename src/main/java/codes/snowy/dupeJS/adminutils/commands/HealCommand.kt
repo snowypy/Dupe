@@ -7,6 +7,7 @@ import org.bukkit.entity.Player
 import org.bukkit.command.CommandSender
 
 @CommandAlias("heal")
+@CommandPermission("dupe.heal")
 class HealCommand: BaseCommand() {
 
     @HelpCommand
