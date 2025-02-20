@@ -1,5 +1,6 @@
 package codes.snowy.dupeJS.missions
 
+import codes.snowy.dupeJS.DupeJS
 import codes.snowy.dupeJS.utils.translate
 import org.bukkit.Bukkit
 import org.bukkit.Sound
@@ -10,10 +11,99 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.util.UUID
 import kotlin.random.Random
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import org.bukkit.scheduler.BukkitRunnable
+import java.io.File
+import java.nio.file.Files
+import java.util.concurrent.TimeUnit
 
 class MissionManager(private val db: MissionDatabase) {
 
     private val dbConnection: Connection = DriverManager.getConnection("jdbc:sqlite:Databases/missions.db")
+    private val cooldownFile = File("plugins/DupeJS/missions/cooldown.json")
+    private val gson = Gson()
+
+    init {
+        loadCooldowns()
+        startResetScheduler()
+    }
+
+    var lastDailyReset: Long = 0
+    var lastWeeklyReset: Long = 0
+
+    private fun loadCooldowns() {
+        if (!cooldownFile.exists()) {
+            cooldownFile.createNewFile()
+            val json = JsonObject()
+            json.addProperty("lastDailyReset", System.currentTimeMillis())
+            json.addProperty("lastWeeklyReset", System.currentTimeMillis())
+            Files.write(cooldownFile.toPath(), gson.toJson(json).toByteArray())
+        } else {
+            val json = gson.fromJson(cooldownFile.readText(), JsonObject::class.java)
+            lastDailyReset = json.get("lastDailyReset").asLong
+            lastWeeklyReset = json.get("lastWeeklyReset").asLong
+        }
+    }
+
+    private fun saveCooldowns() {
+        val json = JsonObject()
+        json.addProperty("lastDailyReset", lastDailyReset)
+        json.addProperty("lastWeeklyReset", lastWeeklyReset)
+        Files.write(cooldownFile.toPath(), gson.toJson(json).toByteArray())
+    }
+
+    private fun startResetScheduler() {
+        object : BukkitRunnable() {
+            override fun run() {
+                val currentTime = System.currentTimeMillis()
+
+                if (currentTime - lastDailyReset >= TimeUnit.DAYS.toMillis(1)) {
+                    resetDailyMissions()
+                    lastDailyReset = currentTime
+                    saveCooldowns()
+                }
+
+                if (currentTime - lastWeeklyReset >= TimeUnit.DAYS.toMillis(7)) {
+                    resetWeeklyMissions()
+                    lastWeeklyReset = currentTime
+                    saveCooldowns()
+                }
+            }
+        }.runTaskTimer(DupeJS.getInstance(), 0L, 72000L)
+    }
+
+    private fun resetDailyMissions() {
+        val playerUUIDs = getAllPlayerUUIDs()
+        playerUUIDs.forEach { playerUUID ->
+            val player = Bukkit.getPlayer(playerUUID)
+            clearPlayerMissions(player ?: return)
+            assignMissions(player, 3, "daily")
+            player?.sendMessage("&#feda36&lMISSIONS &8| &fYour daily missions have been reset!".translate())
+        }
+    }
+
+    private fun resetWeeklyMissions() {
+        val playerUUIDs = getAllPlayerUUIDs()
+        playerUUIDs.forEach { playerUUID ->
+            val player = Bukkit.getPlayer(playerUUID)
+            clearPlayerMissions(player ?: return)
+            assignMissions(player, 2, "weekly")
+            player?.sendMessage("&#feda36&lMISSIONS &8| &fYour weekly missions have been reset!".translate())
+        }
+    }
+
+    fun getAllPlayerUUIDs(): List<UUID> {
+        val playerUUIDs = mutableListOf<UUID>()
+        val statement: PreparedStatement = dbConnection.prepareStatement("SELECT player_uuid FROM player_missions")
+        val resultSet: ResultSet = statement.executeQuery()
+        while (resultSet.next()) {
+            playerUUIDs.add(UUID.fromString(resultSet.getString("player_uuid")))
+        }
+        resultSet.close()
+        statement.close()
+        return playerUUIDs
+    }
 
     fun assignMissions(player: Player) {
         val playerUUID = player.uniqueId
@@ -27,14 +117,56 @@ class MissionManager(private val db: MissionDatabase) {
         missions.forEach { mission ->
             val missionUUID = UUID.randomUUID().toString()
             val statement: PreparedStatement = dbConnection.prepareStatement("""
-                INSERT OR REPLACE INTO player_missions (player_uuid, mission_uuid, mission_type, progress, target, last_updated, claimed)
-                VALUES (?, ?, ?, 0, ?, ?, 0)
+                INSERT OR REPLACE INTO player_missions (player_uuid, mission_uuid, mission_type, progress, target, last_updated, claimed, frequency)
+                VALUES (?, ?, ?, 0, ?, ?, 0, ?)
             """)
             statement.setString(1, playerUUID.toString())
             statement.setString(2, missionUUID)
             statement.setString(3, mission)
             statement.setInt(4, extractTarget(mission))
             statement.setLong(5, System.currentTimeMillis())
+            statement.setString(6, "daily")
+            statement.executeUpdate()
+            statement.close()
+        }
+    }
+
+    fun assignMissions(player: Player, count: Int, frequency: String) {
+        val playerUUID = player.uniqueId
+        val missions = when (frequency) {
+            "daily" -> (1..count).map {
+                val dailyMissions = listOf(
+                    Pair("Kill ${Random.nextInt(1, 11)} players", "Kill Players"),
+                    Pair("Kill ${Random.nextInt(2, 6)} ${getRandomMob()}", "Kill Mobs"),
+                    Pair("Break ${Random.nextInt(100, 251)} blocks", "Break Blocks"),
+                    Pair("Play for ${Random.nextInt(2, 11)} hours", "Play for Hours")
+                )
+                dailyMissions.random()
+            }
+            "weekly" -> (1..count).map {
+                val weeklyMissions = listOf(
+                    Pair("Break ${Random.nextInt(251, 900)} blocks", "Break Blocks"),
+                    Pair("Kill ${Random.nextInt(6, 23)} ${getRandomMob()}", "Kill Mobs"),
+                    Pair("Kill ${Random.nextInt(10, 25)} players", "Kill Players")
+                )
+                weeklyMissions.random()
+            }
+            else -> throw IllegalArgumentException("Unknown frequency: $frequency")
+        }
+
+        missions.forEach { (missionDescription, baseMissionType) ->
+            val missionUUID = UUID.randomUUID().toString()
+            val target = extractTarget(missionDescription)
+            val statement: PreparedStatement = dbConnection.prepareStatement("""
+                INSERT OR REPLACE INTO player_missions (player_uuid, mission_uuid, mission_type, progress, target, last_updated, claimed, frequency)
+                VALUES (?, ?, ?, 0, ?, ?, 0, ?)
+            """)
+            statement.setString(1, playerUUID.toString())
+            statement.setString(2, missionUUID)
+            statement.setString(3, baseMissionType)
+            statement.setInt(4, target)
+            statement.setLong(5, System.currentTimeMillis())
+            statement.setString(6, frequency)
             statement.executeUpdate()
             statement.close()
         }
@@ -123,14 +255,24 @@ class MissionManager(private val db: MissionDatabase) {
     }
 
     private fun extractTarget(mission: String): Int {
-        return mission.split(" ")[1].toInt()
+        return try {
+            val parts = mission.split(" ")
+            if (parts.size >= 3 && parts[1] == "for") {
+                parts[2].toInt()
+            } else {
+                mission.split(" ")[1].toInt()
+            }
+        } catch (e: Exception) {
+            Bukkit.getLogger().warning("Failed to extract target from mission: $mission. Defaulting to 0.")
+            0
+        }
     }
 
     fun getPlayerMissions(player: Player): List<Mission> {
         val playerUUID = player.uniqueId
         val missions = mutableListOf<Mission>()
         val statement: PreparedStatement = dbConnection.prepareStatement("""
-            SELECT mission_uuid, mission_type, progress, target, last_updated, claimed FROM player_missions
+            SELECT mission_uuid, mission_type, progress, target, last_updated, claimed, frequency FROM player_missions
             WHERE player_uuid = ?
         """)
         statement.setString(1, playerUUID.toString())
@@ -143,7 +285,7 @@ class MissionManager(private val db: MissionDatabase) {
                 progress = resultSet.getInt("progress"),
                 target = resultSet.getInt("target"),
                 lastUpdated = resultSet.getLong("last_updated"),
-                frequency = determineFrequency(resultSet.getString("mission_type")),
+                frequency = resultSet.getString("frequency"),
                 claimed = resultSet.getBoolean("claimed")
             )
             missions.add(mission)
@@ -170,42 +312,8 @@ class MissionManager(private val db: MissionDatabase) {
     fun ensureMissionsAssigned(player: Player) {
         val missions = getPlayerMissions(player)
         if (missions.isEmpty()) {
-            assignMissions(player, 2, "daily")
-            assignMissions(player, 3, "weekly")
-        }
-    }
-
-    fun assignMissions(player: Player, count: Int, frequency: String) {
-        val playerUUID = player.uniqueId
-        val missions = (1..count).map {
-            when (frequency) {
-                "daily" -> Pair("Kill ${Random.nextInt(1, 11)} players", "Kill Players")
-                "weekly" -> Pair("Break ${Random.nextInt(100, 251)} blocks", "Break Blocks")
-                else -> throw IllegalArgumentException("Unknown frequency: $frequency")
-            }
-        }
-
-        missions.forEach { (mission, missionType) ->
-            val missionUUID = UUID.randomUUID().toString()
-            val statement: PreparedStatement = dbConnection.prepareStatement("""
-                INSERT OR REPLACE INTO player_missions (player_uuid, mission_uuid, mission_type, progress, target, last_updated, claimed)
-                VALUES (?, ?, ?, 0, ?, ?, 0)
-            """)
-            statement.setString(1, playerUUID.toString())
-            statement.setString(2, missionUUID)
-            statement.setString(3, missionType)
-            statement.setInt(4, extractTarget(mission))
-            statement.setLong(5, System.currentTimeMillis())
-            statement.executeUpdate()
-            statement.close()
-        }
-    }
-
-    private fun determineFrequency(missionType: String): String {
-        return when {
-            missionType.contains("Kill") -> "daily"
-            missionType.contains("Break") -> "weekly"
-            else -> "daily"
+            assignMissions(player, 3, "daily")
+            assignMissions(player, 2, "weekly")
         }
     }
 
@@ -258,4 +366,4 @@ class MissionManager(private val db: MissionDatabase) {
         statement.executeUpdate()
         statement.close()
     }
-} 
+}

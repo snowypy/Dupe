@@ -22,7 +22,11 @@ class MissionListener(private val missionManager: MissionManager) : Listener {
         object : BukkitRunnable() {
             override fun run() {
                 playerPlaytime.forEach { (uuid, time) ->
-                    missionManager.updateMissionProgress(Bukkit.getPlayer(uuid) ?: return@forEach, "Playtime", 1)
+                    val player = Bukkit.getPlayer(uuid) ?: return@forEach
+                    val missions = missionManager.getPlayerMissions(player)
+                    if (missions.any { it.missionType == "Play for Hours" && !it.claimed }) {
+                        missionManager.updateMissionProgress(player, "Play for Hours", 1)
+                    }
                 }
             }
         }.runTaskTimer(DupeJS.getInstance(), 0L, 1200L)
@@ -36,7 +40,11 @@ class MissionListener(private val missionManager: MissionManager) : Listener {
 
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
-        playerPlaytime[event.player.uniqueId] = System.currentTimeMillis()
+        val player = event.player
+        val missions = missionManager.getPlayerMissions(player)
+        if (missions.any { it.missionType == "Play for Hours" && !it.claimed }) {
+            playerPlaytime[player.uniqueId] = System.currentTimeMillis()
+        }
     }
 
     @EventHandler
@@ -44,7 +52,7 @@ class MissionListener(private val missionManager: MissionManager) : Listener {
         val playerUUID = event.player.uniqueId
         val joinTime = playerPlaytime.remove(playerUUID) ?: return
         val playtimeMinutes = (System.currentTimeMillis() - joinTime) / 60000
-        missionManager.updateMissionProgress(event.player, "Playtime", playtimeMinutes.toInt())
+        missionManager.updateMissionProgress(event.player, "Play for Hours", playtimeMinutes.toInt())
     }
 
     @EventHandler

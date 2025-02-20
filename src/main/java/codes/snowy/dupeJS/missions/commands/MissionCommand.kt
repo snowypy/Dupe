@@ -12,7 +12,7 @@ import codes.snowy.dupeJS.utils.translate
 import org.bukkit.entity.Player
 import java.sql.PreparedStatement
 
-@CommandAlias("mission")
+@CommandAlias("mission|missions")
 class MissionCommand(
     private val missionManager: MissionManager,
     private val missionGUI: MissionGUI,

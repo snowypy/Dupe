@@ -22,6 +22,7 @@ class MissionDatabase {
                 target INT,
                 last_updated LONG,
                 claimed BOOLEAN DEFAULT 0,
+                frequency TEXT,
                 PRIMARY KEY (player_uuid, mission_uuid)
             )
         """)

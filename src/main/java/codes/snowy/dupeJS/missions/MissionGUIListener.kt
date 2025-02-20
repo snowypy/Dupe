@@ -18,7 +18,7 @@ class MissionGUIListener(private val missionManager: MissionManager, private val
         val title = event.view.title
         val clickedItem: ItemStack? = event.currentItem
 
-        if (title == "&#feda36&lMISSIONS".translate()) {
+        if (title == "&#fdfa28&lMISSIONS".translate()) {
             event.isCancelled = true
 
             clickedItem?.itemMeta?.lore?.let { lore ->

@@ -14,20 +14,37 @@ class MissionGUI(private val missionManager: MissionManager, private val rewardS
     fun openMissionSelector(player: Player) {
         missionManager.ensureMissionsAssigned(player)
         val inventorySize = 27
-        val inventory = Bukkit.createInventory(null, inventorySize, "&#feda36&lMISSIONS".translate())
+        val inventory = Bukkit.createInventory(null, inventorySize, "&#fdfa28&lMISSIONS".translate())
+
+        val dailyResetTimeLeft = missionManager.lastDailyReset + TimeUnit.DAYS.toMillis(1) - System.currentTimeMillis()
+        val weeklyResetTimeLeft = missionManager.lastWeeklyReset + TimeUnit.DAYS.toMillis(7) - System.currentTimeMillis()
+
+        val clockItem = ItemStack(Material.CLOCK).apply {
+            itemMeta = itemMeta?.apply {
+                setDisplayName("&#fdfa28&lMISSION RESETS".translate())
+                lore = listOf(
+                    "",
+                    "&#33e1ff&l| &fDaily Reset: &#33e1ff${formatTime(dailyResetTimeLeft)}".translate(),
+                    "&#ff9433&l| &fWeekly Reset: &#ff9433${formatTime(weeklyResetTimeLeft)}".translate(),
+                    ""
+                )
+            }
+        }
+
+        for (i in 0 until inventory.size) {
+            if (inventory.getItem(i) == null) {
+                inventory.setItem(i, ItemStack(Material.GRAY_STAINED_GLASS_PANE).apply {
+                    itemMeta = itemMeta?.apply {
+                        setDisplayName(" ")
+                    }
+                })
+            }
+        }
 
         val missions = missionManager.getPlayerMissions(player)
         val middleRowStart = 9
         val middleRowEnd = 17
         val missionSlots = (middleRowStart..middleRowEnd).toList()
-
-        for (i in 0 until inventory.size) {
-            inventory.setItem(i, ItemStack(Material.GRAY_STAINED_GLASS_PANE).apply {
-                itemMeta = itemMeta?.apply {
-                    setDisplayName(" ")
-                }
-            })
-        }
 
         val totalMissions = missions.size
         val startSlot = (missionSlots.size - totalMissions) / 2
@@ -65,7 +82,16 @@ class MissionGUI(private val missionManager: MissionManager, private val rewardS
             inventory.setItem(missionSlots[startSlot + index], nbtItem.item)
         }
 
+        inventory.setItem(4, clockItem)
+
         player.openInventory(inventory)
+    }
+
+    private fun formatTime(timeInMillis: Long): String {
+        val days = TimeUnit.MILLISECONDS.toDays(timeInMillis) % 7
+        val hours = TimeUnit.MILLISECONDS.toHours(timeInMillis) % 24
+        val minutes = TimeUnit.MILLISECONDS.toMinutes(timeInMillis) % 60
+        return "${days}d ${hours}h ${minutes}m"
     }
 
     private fun formatTimeSince(lastUpdated: Long): String {
