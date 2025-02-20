@@ -7,7 +7,7 @@ import codes.snowy.dupeJS.afk.AFKAdminCommand;
 import codes.snowy.dupeJS.afk.AFKCommand;
 import codes.snowy.dupeJS.afk.AFKManager;
 import codes.snowy.dupeJS.basic.*;
-import codes.snowy.dupeJS.dupe.DupeRechargeCommand;
+import codes.snowy.dupeJS.dupe.*;
 import codes.snowy.dupeJS.economy.DupeyEconomy;
 import codes.snowy.dupeJS.economy.EconomyCommand;
 import codes.snowy.dupeJS.economy.PayCommand;
@@ -45,9 +45,6 @@ import codes.snowy.dupeJS.bundles.PreviewBundleCommand;
 import codes.snowy.dupeJS.crushplus.CrushPlusManager;
 import codes.snowy.dupeJS.crushplus.FlightCommand;
 import codes.snowy.dupeJS.crushplus.FlightRestrictionListener;
-import codes.snowy.dupeJS.dupe.DupeBlacklistCommand;
-import codes.snowy.dupeJS.dupe.DupeCommand;
-import codes.snowy.dupeJS.dupe.DupeManager;
 import codes.snowy.dupeJS.homes.HomeCommand;
 import codes.snowy.dupeJS.homes.HomeListener;
 import codes.snowy.dupeJS.homes.HomeManager;
@@ -245,7 +242,8 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Pay Command", "success");
         manager.registerCommand(new BalanceCommand());
         Logger.INSTANCE.log("Loaded the Balance Command", "success");
-
+        manager.registerCommand(new RechargeAllDupeCommand(dupeManager));
+        Logger.INSTANCE.log("Loaded the RechargeAllDupe Command", "success");
 
         /*
         
