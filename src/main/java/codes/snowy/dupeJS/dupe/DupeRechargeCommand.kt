@@ -29,7 +29,6 @@ class DupeRechargeCommand(val dupeManager: DupeManager) : BaseCommand() {
         if (playerName == null) {
             if (sender is Player) {
                 dupeManager.rechargeDupe(sender)
-                sender.sendMessage("&aYou recharged your dupe charges.".translate())
                 return
             }
         }
@@ -40,7 +39,6 @@ class DupeRechargeCommand(val dupeManager: DupeManager) : BaseCommand() {
             dupeManager.rechargeDupe(sender as Player)
         } else if (player === sender) {
             dupeManager.rechargeDupe(sender)
-            sender.sendMessage("&aYou recharged your dupe charges.".translate())
             return
         } else {
             dupeManager.rechargeDupe(player)
