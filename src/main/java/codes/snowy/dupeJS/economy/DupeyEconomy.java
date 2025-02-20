@@ -7,16 +7,38 @@ import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.ServicePriority;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class DupeyEconomy extends AbstractEconomy {
 
-    private Map<String, Integer> balances = new HashMap<>();
+    private Connection dbConnection;
 
     private DupeyEconomy() {
+        connectDatabase();
+        createTable();
+    }
+
+    private void connectDatabase() {
+        try {
+            dbConnection = DriverManager.getConnection("jdbc:sqlite:Databases/economy.db");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createTable() {
+        try (PreparedStatement statement = dbConnection.prepareStatement(
+                "CREATE TABLE IF NOT EXISTS balances (player_name TEXT PRIMARY KEY, balance LONG)")) {
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -41,7 +63,7 @@ public class DupeyEconomy extends AbstractEconomy {
 
     @Override
     public String format(double amount) {
-        return ((int) amount) + " " + (((int) amount) == 1 ? this.currencyNameSingular() : this.currencyNamePlural());
+        return ((long) amount) + " " + (((long) amount) == 1 ? this.currencyNameSingular() : this.currencyNamePlural());
     }
 
     @Override
@@ -56,91 +78,109 @@ public class DupeyEconomy extends AbstractEconomy {
 
     @Override
     public boolean hasAccount(String playerName) {
-        return this.hasAccountByName(playerName);
+        return hasAccountByName(playerName);
     }
 
     @Override
     public boolean hasAccount(String playerName, String worldName) {
-        return this.hasAccountByName(playerName);
+        return hasAccountByName(playerName);
     }
 
     @Override
     public double getBalance(String playerName) {
-        return this.getByName(playerName);
+        return getByName(playerName);
     }
 
     @Override
     public double getBalance(String playerName, String world) {
-        return this.getByName(playerName);
+        return getByName(playerName);
     }
 
     @Override
     public boolean has(String playerName, double amount) {
-        return this.hasByName(playerName, amount);
+        return hasByName(playerName, amount);
     }
 
     @Override
     public boolean has(String playerName, String worldName, double amount) {
-        return this.hasByName(playerName, amount);
+        return hasByName(playerName, amount);
     }
 
     private boolean hasAccountByName(String playerName) {
-        System.out.println("hasAccount() detected! Map: " + this.balances);
-
-        return this.balances.containsKey(playerName);
+        try (PreparedStatement statement = dbConnection.prepareStatement("SELECT * FROM balances WHERE player_name = ?")) {
+            statement.setString(1, playerName);
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    private double getByName(String playerName) {
-        System.out.println("getBalance() detected! Map: " + this.balances);
-
-        return this.balances.getOrDefault(playerName, 0);
+    private long getByName(String playerName) {
+        try (PreparedStatement statement = dbConnection.prepareStatement("SELECT balance FROM balances WHERE player_name = ?")) {
+            statement.setString(1, playerName);
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.next() ? resultSet.getLong("balance") : 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
     private boolean hasByName(String playerName, double amount) {
-        System.out.println("has() detected! Map: " + this.balances);
-
-        return this.balances.getOrDefault(playerName, 0) >= amount;
+        return getByName(playerName) >= amount;
     }
 
     @Override
     public EconomyResponse withdrawPlayer(String playerName, double amount) {
-        return this.withdrawPlayer(playerName, null, amount);
+        return withdrawPlayer(playerName, null, amount);
     }
 
     @Override
     public EconomyResponse withdrawPlayer(String playerName, String worldName, double amount) {
         if (amount < 0)
-            return new EconomyResponse(0, this.getBalance(playerName), EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
+            return new EconomyResponse(0, getBalance(playerName), EconomyResponse.ResponseType.FAILURE, "Cannot withdraw negative funds");
 
         if (!has(playerName, amount)) {
-            return new EconomyResponse(0, this.getBalance(playerName), EconomyResponse.ResponseType.FAILURE, "Insufficient funds");
+            return new EconomyResponse(0, getBalance(playerName), EconomyResponse.ResponseType.FAILURE, "Insufficient funds");
         }
 
-        this.balances.put(playerName, (int) (this.getByName(playerName) - amount));
-        System.out.println("Withdraw detected! Map: " + this.balances);
+        long newBalance = getByName(playerName) - (long) amount;
+        updateBalance(playerName, newBalance);
 
-        return new EconomyResponse(amount, this.getByName(playerName), EconomyResponse.ResponseType.SUCCESS, "");
+        return new EconomyResponse(amount, getByName(playerName), EconomyResponse.ResponseType.SUCCESS, "");
     }
 
     @Override
     public EconomyResponse depositPlayer(String playerName, double amount) {
-        return this.depositPlayer(playerName, null, amount);
+        return depositPlayer(playerName, null, amount);
     }
 
     @Override
     public EconomyResponse depositPlayer(String playerName, String worldName, double amount) {
         if (amount < 0)
-            return new EconomyResponse(0, this.getBalance(playerName), EconomyResponse.ResponseType.FAILURE, "Cannot deposit negative funds");
+            return new EconomyResponse(0, getBalance(playerName), EconomyResponse.ResponseType.FAILURE, "Cannot deposit negative funds");
 
-        this.balances.put(playerName, (int) (this.getByName(playerName) + amount));
-        System.out.println("Deposit detected! Map: " + this.balances);
+        long newBalance = getByName(playerName) + (long) amount;
+        updateBalance(playerName, newBalance);
 
-        return new EconomyResponse(amount, this.getBalance(playerName), EconomyResponse.ResponseType.SUCCESS, "");
+        return new EconomyResponse(amount, getByName(playerName), EconomyResponse.ResponseType.SUCCESS, "");
+    }
+
+    private void updateBalance(String playerName, long newBalance) {
+        try (PreparedStatement statement = dbConnection.prepareStatement("REPLACE INTO balances (player_name, balance) VALUES (?, ?)")) {
+            statement.setString(1, playerName);
+            statement.setLong(2, newBalance);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public EconomyResponse createBank(String name, String player) {
-        return new EconomyResponse(0, this.getBalance(player), EconomyResponse.ResponseType.NOT_IMPLEMENTED, "Not implemented");
+        return new EconomyResponse(0, getBalance(player), EconomyResponse.ResponseType.NOT_IMPLEMENTED, "Not implemented");
     }
 
     @Override
