@@ -17,11 +17,13 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.*
 import kotlin.collections.HashMap
+import org.bukkit.scheduler.BukkitRunnable
 
 class DupeManager {
 
     private val config = Config(DupeJS.getInstance())
     private val dbConnection: Connection
+    private var lastResetTime: Long = 0
 
     private val rankDupeLimits: Map<String, Int> = mapOf(
         "default" to 30,
@@ -34,6 +36,7 @@ class DupeManager {
     init {
         dbConnection = DriverManager.getConnection("jdbc:sqlite:Databases/dupe.db")
         createTable()
+        startDupeResetScheduler()
     }
 
     private fun createTable() {
@@ -65,7 +68,7 @@ class DupeManager {
         val playerRank = getPlayerRank(player)
         val maxDupes = rankDupeLimits[playerRank] ?: rankDupeLimits["default"]!!
 
-        saveDupeCount(playerUUID, maxDupes)
+        saveDupeCount(playerUUID, 0)
         player.sendMessage("&#ff3358&lDUPE &8| &fYou have &#98f81d&nRECHARGED&f your dupe limit!".translate())
     }
 
@@ -97,7 +100,8 @@ class DupeManager {
             return
         }
 
-        if (player.inventory.size <= 36) {
+        val freeSlots = player.inventory.size - player.inventory.contents.count { it != null }
+        if (freeSlots <= 0) {
             player.sendMessage("&#ff3358&lDUPE &8| &#ff0000&nHey!&r &fYour inventory is full.".translate())
             return
         }
@@ -185,5 +189,52 @@ class DupeManager {
             player.hasPermission("dupe.rank.titan") -> "vip"
             else -> "default"
         }
+    }
+
+    private fun startDupeResetScheduler() {
+        object : BukkitRunnable() {
+            override fun run() {
+                val currentTime = System.currentTimeMillis()
+                val calendar = Calendar.getInstance()
+                calendar.timeInMillis = currentTime
+                val hour = calendar.get(Calendar.HOUR_OF_DAY)
+                val minute = calendar.get(Calendar.MINUTE)
+
+                if (hour == 12 && minute == 0) {
+                    if (currentTime - lastResetTime >= 20 * 60 * 60 * 1000) {
+                        resetAllDupeCounts()
+                    }
+                }
+            }
+        }.runTaskTimer(DupeJS.getInstance(), 0L, 600L)
+    }
+
+    fun resetAllDupeCounts() {
+        val statement = dbConnection.prepareStatement("SELECT uuid FROM dupe_counts")
+        val resultSet: ResultSet = statement.executeQuery()
+        
+        val playerUUIDs = mutableListOf<UUID>()
+        while (resultSet.next()) {
+            playerUUIDs.add(UUID.fromString(resultSet.getString("uuid")))
+        }
+        
+        val totalPlayers = playerUUIDs.size
+        Bukkit.broadcastMessage("")
+        Bukkit.broadcastMessage("&#ff3358&lDUPEY&f&lSTEALY &8| &fA process has started to reset all dupe charges.".translate())
+        Bukkit.broadcastMessage("")
+
+        if (totalPlayers > 0) {
+            playerUUIDs.forEach { playerUUID ->
+                saveDupeCount(playerUUID, 0)
+            }
+
+            Bukkit.broadcastMessage("")
+            Bukkit.broadcastMessage("&#ff3358&lDUPEY&f&lSTEALY &8| &fAll dupe charges have been reset for $totalPlayers players.".translate())
+            Bukkit.broadcastMessage("")
+        } else {
+            Bukkit.broadcastMessage("&#ff3358&lDUPEY&f&lSTEALY &8| &fNo players found to reset dupe charges.".translate())
+        }
+        
+        lastResetTime = System.currentTimeMillis()
     }
 }
