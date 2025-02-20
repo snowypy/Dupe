@@ -2,6 +2,7 @@ package codes.snowy.dupeJS.economy
 
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
+import codes.snowy.dupeJS.utils.NumberConverter.convertCompact
 import codes.snowy.dupeJS.utils.translate
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -32,6 +33,6 @@ class BalanceCommand : BaseCommand() {
         }
 
         val balance = VaultHook.getBalance(target)
-        sender.sendMessage("&#00FF00&lBALANCE &8| &f${target.name}'s balance is: $${balance}".translate())
+        sender.sendMessage("&#00FF00&lBALANCE &8| &f${target.name}'s balance is &#00FF00$${convertCompact(balance)} &7[$${balance}]".translate())
     }
 } 
