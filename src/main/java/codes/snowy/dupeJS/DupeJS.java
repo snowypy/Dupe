@@ -10,6 +10,7 @@ import codes.snowy.dupeJS.basic.*;
 import codes.snowy.dupeJS.dupe.DupeRechargeCommand;
 import codes.snowy.dupeJS.economy.DupeyEconomy;
 import codes.snowy.dupeJS.economy.EconomyCommand;
+import codes.snowy.dupeJS.economy.PayCommand;
 import codes.snowy.dupeJS.missions.MissionGUIListener;
 import codes.snowy.dupeJS.missions.MissionManager;
 import codes.snowy.dupeJS.missions.MissionDatabase;
@@ -127,6 +128,12 @@ public final class DupeJS extends JavaPlugin {
             return;
         }
 
+        /*
+
+            Registering Managers
+
+        */
+
         homeManager = new HomeManager();
         teleportManager = new TeleportManager(this);
         dupeManager = new DupeManager();
@@ -151,10 +158,17 @@ public final class DupeJS extends JavaPlugin {
 
         Logger.INSTANCE.log("Loaded Command Completions", "success");
         commandCompletions = new CommandCompletions(kitManager, warpManager);
-
         commandCompletions.register(manager);
 
+        // Injecting into Vault Economy
         DupeyEconomy.register();
+
+
+        /*
+
+            Commands
+
+        */
 
         manager.registerCommand(new DupeCommand(dupeManager));
         Logger.INSTANCE.log("Loaded the Dupe Command", "success");
@@ -226,6 +240,15 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Store Command", "success");
         manager.registerCommand(new EconomyCommand());
         Logger.INSTANCE.log("Loaded the Economy Command", "success");
+        manager.registerCommand(new PayCommand());
+        Logger.INSTANCE.log("Loaded the Pay Command", "success");
+
+
+        /*
+        
+            Listeners
+
+        */
 
         getServer().getPluginManager().registerEvents(new LifestealListener(lifestealmanager, dupeManager), this);
         Logger.INSTANCE.log("Loaded the Lifesteal Listener", "success");
@@ -289,8 +312,8 @@ public final class DupeJS extends JavaPlugin {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            getLogger().severe("&cFailed to load configuration file in start up");
-            getLogger().severe("&cAuto disabling WatchTower... make a ticket in discord");
+            Logger.INSTANCE.log("Failed to load config file on start-up", "error");
+            Logger.INSTANCE.log("Auto disabling DupeJS... contact @snowyjs", "error");
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
