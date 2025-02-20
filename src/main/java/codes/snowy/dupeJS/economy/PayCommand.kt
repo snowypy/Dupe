@@ -2,6 +2,7 @@ package codes.snowy.dupeJS.economy
 
 import co.aikar.commands.BaseCommand
 import co.aikar.commands.annotation.*
+import codes.snowy.dupeJS.utils.NumberConverter.convertCompact
 import codes.snowy.dupeJS.utils.translate
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -39,8 +40,8 @@ class PayCommand : BaseCommand() {
         val result = VaultHook.withdraw(sender, amount)
         if (result.isEmpty()) {
             VaultHook.deposit(target, amount)
-            sender.sendMessage("&#00FF00&lSUCCESS &8| &fYou sent &#00FF00&n$${amount.toInt()}&f to ${target.name}".translate())
-            target.sendMessage("&#00FF00&lSUCCESS &8| &fYou received &#00FF00&n$${amount.toInt()}&f from ${sender.name}".translate())
+            sender.sendMessage("&#00FF00&lSUCCESS &8| &fYou sent &#00FF00$${convertCompact(amount)} &7[$${amount.toInt()}]&f to ${target.name}".translate())
+            target.sendMessage("&#00FF00&lSUCCESS &8| &fYou received &#00FF00$${convertCompact(amount)} &7[$${amount.toInt()}]&f from ${sender.name}".translate())
         } else {
             sender.sendMessage("&#FF0000&lERROR &8| &f$result".translate())
         }
