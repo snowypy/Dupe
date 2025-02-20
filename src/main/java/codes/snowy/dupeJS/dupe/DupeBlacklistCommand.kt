@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 @CommandAlias("blacklistdupe")
+@CommandPermission("dupe.blacklist")
 class DupeBlacklistCommand(val dupeManager: DupeManager) : BaseCommand() {
 
     @HelpCommand

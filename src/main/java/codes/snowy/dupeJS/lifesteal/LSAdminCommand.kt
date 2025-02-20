@@ -1,14 +1,12 @@
 package codes.snowy.dupeJS.lifesteal
 
 import co.aikar.commands.BaseCommand
-import co.aikar.commands.annotation.CommandAlias
-import co.aikar.commands.annotation.HelpCommand
-import co.aikar.commands.annotation.Subcommand
-import co.aikar.commands.annotation.Syntax
+import co.aikar.commands.annotation.*
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
 @CommandAlias("lsadmin")
+@CommandPermission("dupe.lsadmin")
 class LSAdminCommand(private val manager: LifestealManager) : BaseCommand() {
 
     @HelpCommand
