@@ -72,7 +72,7 @@ class DupeManager {
         player.sendMessage("&#ff3358&lDUPE &8| &fYou have &#98f81d&nRECHARGED&f your dupe limit!".translate())
     }
 
-    fun dupe(player: Player) {
+    fun dupe(player: Player, amount: Int = 1) {
         val playerUUID = player.uniqueId
         val playerRank = getPlayerRank(player)
         if (config.getBoolean("dupe.debug", false)) {
@@ -100,9 +100,9 @@ class DupeManager {
             return
         }
 
-        val freeSlots = player.inventory.size - player.inventory.contents.count { it != null }
-        if (freeSlots <= 0) {
-            player.sendMessage("&#ff3358&lDUPE &8| &#ff0000&nHey!&r &fYour inventory is full.".translate())
+        val freeSlots = player.inventory.storageContents.count { it == null }
+        if (freeSlots < amount) {
+            player.sendMessage("&#ff3358&lDUPE &8| &#ff0000&nHey!&r &fYour inventory doesn't have enough space for ${amount} items.".translate())
             return
         }
 
@@ -111,15 +111,18 @@ class DupeManager {
             return
         }
 
-        player.inventory.addItem(item)
-        val newCount = currentDupes + 1
+        for (i in 1..amount) {
+            player.inventory.addItem(item)
+        }
+        
+        val newCount = currentDupes + amount
         saveDupeCount(playerUUID, newCount)
         val itemformat = item.type.toString().formatMaterial()
 
         if (itemamount > 1) {
-            player.sendMessage("&#ff3358&lDUPE &8| &fYou have duplicated &#ff3358$itemamount&#ff3358x $itemformat".translate())
+            player.sendMessage("&#ff3358&lDUPE &8| &fYou have duplicated &#ff3358${itemamount * amount}&#ff3358x $itemformat".translate())
         } else {
-            player.sendMessage("&#ff3358&lDUPE &8| &fYou have duplicated a &#ff3358$itemformat".translate())
+            player.sendMessage("&#ff3358&lDUPE &8| &fYou have duplicated &#ff3358${amount}x&#ff3358 $itemformat".translate())
         }
     }
 
