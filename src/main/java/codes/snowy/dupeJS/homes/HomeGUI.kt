@@ -12,9 +12,10 @@ import org.bukkit.inventory.meta.ItemMeta
 class HomeGUI(private val homeManager: HomeManager, private val player: Player) {
 
     fun open() {
-        val inventory = Bukkit.createInventory(null, 27, "&7Your Homes".translate())
+        val inventory = Bukkit.createInventory(null, 36, "&7Your Homes".translate())
         val homes = homeManager.getHomes(player.uniqueId)
         val maxHomes = getMaxHomes(player)
+        val middleSlots = listOf(11, 12, 13, 14, 15, 20, 21, 22, 23, 24)
 
         for (i in 0 until maxHomes) {
             val home = homes.getOrNull(i)
@@ -38,7 +39,7 @@ class HomeGUI(private val homeManager: HomeManager, private val player: Player) 
                     )
                 }
             }
-            inventory.setItem(11 + i, item)
+            inventory.setItem(middleSlots[i], item)
         }
 
         for (i in inventory.contents.indices) {
@@ -54,9 +55,10 @@ class HomeGUI(private val homeManager: HomeManager, private val player: Player) 
 
     fun getMaxHomes(player: Player): Int {
         return when {
-            player.hasPermission("home.toprank") -> 5
-            player.hasPermission("home.midrank") -> 4
-            player.hasPermission("home.shitrank") -> 2
+            player.hasPermission("home.hero") -> 10
+            player.hasPermission("home.ultra") -> 7
+            player.hasPermission("home.pro") -> 5
+            player.hasPermission("home.titan") -> 2
             else -> 1
         }
     }
