@@ -10,8 +10,23 @@ import org.bukkit.inventory.ItemStack
 class ShardShopGUI(private val afkManager: AFKManager) {
 
     fun open(player: Player) {
-        val inventory = Bukkit.createInventory(null, 27, "&b&lShard Shop".translate())
+        val inventory = Bukkit.createInventory(null, 27, "&#9436fe&lShard Shop".translate())
         val items = ShardShop.getItems()
+
+        val statItem = ItemStack(Material.AMETHYST_SHARD).apply {
+            itemMeta = itemMeta?.apply {
+                setDisplayName("&#9436fe&lShard Shop".translate())
+                lore = listOf(
+                    "".translate(),
+                    "&fYou can earn shards by visiting &7[/AFK]".translate(),
+                    "".translate(),
+                    "&fYour Shards: &#9436fe${afkManager.getShards(player.uniqueId)}".translate(),
+                    "".translate()
+                )
+            }
+        }
+
+        inventory.setItem(4, statItem)
 
         items.entries.forEachIndexed { index, (id, item) ->
             val displayItem = ItemStack(item.material).apply {
