@@ -12,7 +12,7 @@ class ShardShopListener(private val afkManager: AFKManager) : Listener {
 
     @EventHandler
     fun onInventoryClick(event: InventoryClickEvent) {
-        if (event.view.title != "&b&lShard Shop".translate()) return
+        if (event.view.title != "&#9436fe&lShard Shop".translate()) return
         event.isCancelled = true
 
         val player = event.whoClicked as? Player ?: return
