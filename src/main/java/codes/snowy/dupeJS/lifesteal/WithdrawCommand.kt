@@ -25,9 +25,9 @@ class WithdrawCommand(private val manager: LifestealManager) : BaseCommand() {
     @Default
     fun onWithdraw(player: Player, @Optional amount: Int?) {
         val heartsToWithdraw = amount ?: 1
-        val healthToWithdraw = heartsToWithdraw * 2
+        val healthToWithdraw = heartsToWithdraw
 
-        if (healthToWithdraw < 2) {
+        if (healthToWithdraw < 1) {
             player.sendMessage("&#f6294b&lLIFESTEAL &8| &cYou must withdraw at least 1 heart.".translate())
             return
         }
