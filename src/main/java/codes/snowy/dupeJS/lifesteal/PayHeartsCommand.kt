@@ -27,6 +27,11 @@ class PayHeartsCommand(private val manager: LifestealManager) : BaseCommand() {
             return
         }
 
+        if (target == sender) {
+            sender.sendMessage("&#f6294b&lLIFESTEAL &8| &cYou cannot pay hearts to yourself.".translate())
+            return
+        }
+
         val heartsToPay = amount ?: 1
         if (heartsToPay < 1) {
             sender.sendMessage("&#f6294b&lLIFESTEAL &8| &cYou must pay at least 1 heart.".translate())
