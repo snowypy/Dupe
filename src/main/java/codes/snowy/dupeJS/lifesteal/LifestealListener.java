@@ -35,8 +35,8 @@ public class LifestealListener implements Listener {
         }
         Logger.INSTANCE.log("Player " + victim.getName() + " has died!", "info");
 
-        if (manager.removeHearts(victim, 2)) {
-            manager.addHearts(killer, 2);
+        if (manager.removeHearts(victim, 1)) {
+            manager.addHearts(killer, 1);
             killer.sendMessage(TranslationKt.translate("&cYou have stolen a heart"));
             victim.sendMessage(TranslationKt.translate("&c" + killer.getName() + " has stolen a heart from you"));
         }
@@ -71,7 +71,7 @@ public class LifestealListener implements Listener {
             return;
         }
 
-        if (manager.addHearts(player, 2)) {
+        if (manager.addHearts(player, 1)) {
             player.sendMessage(TranslationKt.translate("&#f6294b&lLIFESTEAL &8| &cYou have claimed a heart"));
             event.setCancelled(true);
 
