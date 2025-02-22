@@ -9,8 +9,12 @@ object NumberConverter {
 
         val suffixes = arrayOf("", "k", "M", "B", "T", "Q")
         val exp = floor(Math.log10(number.toDouble()) / 3).toInt()
-
-        val formattedNumber = number / Math.pow(1000.0, exp.toDouble()).toLong()
-        return String.format("%.1f%s", formattedNumber.toDouble(), suffixes[exp])
+        
+        val value = number / Math.pow(1000.0, exp.toDouble())
+        return if (value % 1 == 0.0) {
+            String.format("%d%s", value.toLong(), suffixes[exp])
+        } else {
+            String.format("%.2f%s", value, suffixes[exp])
+        }
     }
 }
