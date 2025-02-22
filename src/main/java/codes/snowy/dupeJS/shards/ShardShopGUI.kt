@@ -1,11 +1,15 @@
 package codes.snowy.dupeJS.shards
 
 import codes.snowy.dupeJS.afk.AFKManager
+import codes.snowy.dupeJS.utils.Logger
+import codes.snowy.dupeJS.utils.NumberConverter.convertCompact
+import codes.snowy.dupeJS.utils.NumberFormatter.convertShort
 import codes.snowy.dupeJS.utils.translate
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.ItemFlag
 
 class ShardShopGUI(private val afkManager: AFKManager) {
 
@@ -23,6 +27,7 @@ class ShardShopGUI(private val afkManager: AFKManager) {
                     "&fYour Shards: &#9436fe${afkManager.getShards(player.uniqueId)}".translate(),
                     "".translate()
                 )
+                addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
             }
         }
 
@@ -35,18 +40,23 @@ class ShardShopGUI(private val afkManager: AFKManager) {
                 val displayItem = ItemStack(item.material).apply {
                     itemMeta = itemMeta?.apply {
                         setDisplayName(item.displayName)
+                        addItemFlags(ItemFlag.HIDE_ATTRIBUTES)
+                        setCustomModelData(1111)
                         val updatedLore = mutableListOf<String>()
                         updatedLore.addAll(item.lore)
                         updatedLore.add("&7Cost: &#9436fe${item.price} Shards".translate())
                         if (item.cashPrice != null) {
-                            updatedLore.add("&7Cash Price: &a$${String.format("%.2f", item.cashPrice)}".translate())
+                            updatedLore.add("&7Cash Price: &a$${convertCompact(item.cashPrice.toLong())}".translate())
                             updatedLore.add("")
                             updatedLore.add("&7Left-Click to purchase with &#9436feShards".translate())
-                            updatedLore.add("&7Right-Click to purchase with &a$".translate())
+                            updatedLore.add("&7Right-Click to purchase with &a$${convertCompact(item.cashPrice.toLong())}".translate())
                         }
                         lore = updatedLore
+
                     }
                 }
+
+
                 inventory.setItem(middleSlots[index], displayItem)
             }
         }
