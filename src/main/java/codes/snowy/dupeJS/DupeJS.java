@@ -21,6 +21,8 @@ import codes.snowy.dupeJS.missions.RewardSystemListener;
 import codes.snowy.dupeJS.missions.MissionListener;
 import codes.snowy.dupeJS.missions.commands.ForceResetMissionsCommand;
 import codes.snowy.dupeJS.missions.commands.MissionCommand;
+import codes.snowy.dupeJS.player.PlayerListener;
+import codes.snowy.dupeJS.player.PlayerManager;
 import codes.snowy.dupeJS.session.SessionListener;
 import codes.snowy.dupeJS.shards.ShardShopCommand;
 import codes.snowy.dupeJS.shards.ShardShopGUI;
@@ -90,6 +92,7 @@ public final class DupeJS extends JavaPlugin {
     AFKManager afkManager;
     AFKRewardTask afkRewardTask;
     ShardShopGUI shardShopGUI;
+    PlayerManager playerManager;
     private Config config;
     private Language language;
     private static DupeJS instance;
@@ -150,6 +153,7 @@ public final class DupeJS extends JavaPlugin {
         warpDatabase = new WarpDatabase();
         warpManager = new WarpManager(warpDatabase);
         WarpGUI warpGUI = new WarpGUI(warpManager, teleportManager);
+        playerManager = new PlayerManager();
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("help");
@@ -299,6 +303,9 @@ public final class DupeJS extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new WarpGUIListener(warpManager, teleportManager), this);
         Logger.INSTANCE.log("Loaded the WarpGUI Listener", "success");
+
+        getServer().getPluginManager().registerEvents(new PlayerListener(playerManager), this);
+        Logger.INSTANCE.log("Loaded the Player Listener", "success");
 
     }
 
