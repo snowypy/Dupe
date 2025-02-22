@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack
 class ShardShopGUI(private val afkManager: AFKManager) {
 
     fun open(player: Player) {
-        val inventory = Bukkit.createInventory(null, 27, "&#9436fe&lShard Shop".translate())
+        val inventory = Bukkit.createInventory(null, 36, "&#9436fe&lShard Shop".translate())
         val items = ShardShop.getItems()
 
         val statItem = ItemStack(Material.AMETHYST_SHARD).apply {
@@ -28,14 +28,27 @@ class ShardShopGUI(private val afkManager: AFKManager) {
 
         inventory.setItem(4, statItem)
 
+        val middleSlots = listOf(10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 22, 23, 24, 25)
+        
         items.entries.forEachIndexed { index, (id, item) ->
-            val displayItem = ItemStack(item.material).apply {
-                itemMeta = itemMeta?.apply {
-                    setDisplayName(item.displayName)
-                    lore = item.lore
+            if (index < middleSlots.size) {
+                val displayItem = ItemStack(item.material).apply {
+                    itemMeta = itemMeta?.apply {
+                        setDisplayName(item.displayName)
+                        val updatedLore = mutableListOf<String>()
+                        updatedLore.addAll(item.lore)
+                        updatedLore.add("&7Cost: &#9436fe${item.price} Shards".translate())
+                        if (item.cashPrice != null) {
+                            updatedLore.add("&7Cash Price: &a$${String.format("%.2f", item.cashPrice)}".translate())
+                            updatedLore.add("")
+                            updatedLore.add("&7Left-Click to purchase with &#9436feShards".translate())
+                            updatedLore.add("&7Right-Click to purchase with &a$".translate())
+                        }
+                        lore = updatedLore
+                    }
                 }
+                inventory.setItem(middleSlots[index], displayItem)
             }
-            inventory.setItem(10 + index, displayItem)
         }
 
         for (i in 0 until inventory.size) {
