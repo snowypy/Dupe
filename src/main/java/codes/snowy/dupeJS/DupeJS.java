@@ -79,6 +79,9 @@ import java.io.File;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicePriority;
+import codes.snowy.dupeJS.items.ItemManager;
+import codes.snowy.dupeJS.items.commands.AdminSaveCommand;
+import codes.snowy.dupeJS.items.commands.GiveCustomCommand;
 
 public final class DupeJS extends JavaPlugin {
 
@@ -107,6 +110,7 @@ public final class DupeJS extends JavaPlugin {
     CommandCompletions commandCompletions;
     WarpManager warpManager;
     WarpDatabase warpDatabase;
+    private ItemManager itemManager;
 
     public static DupeJS getInstance() {
         return instance;
@@ -155,6 +159,7 @@ public final class DupeJS extends JavaPlugin {
         warpManager = new WarpManager(warpDatabase);
         WarpGUI warpGUI = new WarpGUI(warpManager, teleportManager);
         playerManager = new PlayerManager();
+        itemManager = new ItemManager();
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("help");
@@ -254,6 +259,10 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the ForceResetMissions Command", "success");
         manager.registerCommand(new AdminShardShopCommand());
         Logger.INSTANCE.log("Loaded the AdminShardShop Command", "success");
+        manager.registerCommand(new AdminSaveCommand(itemManager));
+        Logger.INSTANCE.log("Loaded the AdminSave Command", "success");
+        manager.registerCommand(new GiveCustomCommand(itemManager));
+        Logger.INSTANCE.log("Loaded the GiveCustom Command", "success");
 
         /*
         
