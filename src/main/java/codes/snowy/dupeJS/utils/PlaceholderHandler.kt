@@ -1,8 +1,10 @@
 package codes.snowy.dupeJS.utils
 
 import codes.snowy.dupeJS.DupeJS
+import codes.snowy.dupeJS.afk.AFKManager
 import codes.snowy.dupeJS.dupe.DupeManager
 import codes.snowy.dupeJS.economy.VaultHook
+import codes.snowy.dupeJS.player.PlayerManager
 import codes.snowy.dupeJS.utils.NumberConverter.convertCompact
 import me.clip.placeholderapi.expansion.PlaceholderExpansion
 import org.bukkit.entity.Player
@@ -10,9 +12,11 @@ import org.bukkit.entity.Player
 class PlaceholderHandler(plugin: DupeJS) : PlaceholderExpansion() {
     private val plugin: DupeJS = plugin
     private val dupeManager = DupeManager()
+    private val afkManager = AFKManager()
+    private val playerManager = PlayerManager()
 
     override fun getAuthor(): String {
-        return "snowi"
+        return "snowy"
     }
 
     override fun getIdentifier(): String {
@@ -44,6 +48,18 @@ class PlaceholderHandler(plugin: DupeJS) : PlaceholderExpansion() {
             val balance = VaultHook.getBalance(player)
             val formatted = convertCompact(balance.toLong())
             return formatted
+        } else if (params.equals("shards", ignoreCase = true)) {
+            val shards = afkManager.getShards(player.uniqueId)
+            return shards.toString()
+        } else if (params.equals("kdr", ignoreCase = true)) {
+            val kdr = playerManager.getKDR(player.uniqueId)
+            return kdr.toString()
+        } else if (params.equals("deaths", ignoreCase = true)) {
+            val deaths = playerManager.getDeaths(player.uniqueId)
+            return deaths.toString()
+        } else if (params.equals("kills", ignoreCase = true)) {
+            val kills = playerManager.getKills(player.uniqueId)
+            return kills.toString()
         }
         return "&cInvalid placeholder.".translate()
     }
