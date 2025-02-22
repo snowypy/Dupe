@@ -9,6 +9,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.ClickType
 import codes.snowy.dupeJS.economy.VaultHook
+import codes.snowy.dupeJS.utils.NumberConverter.convertCompact
 
 class ShardShopListener(private val afkManager: AFKManager) : Listener {
 
@@ -57,13 +58,13 @@ class ShardShopListener(private val afkManager: AFKManager) : Listener {
         }
 
         if (VaultHook.getBalance(player) < cashPrice) {
-            player.sendMessage("&#9436fe&lSHARDS &8| &cYou don't have enough money! You need $${String.format("%.2f", cashPrice)}.".translate())
+            player.sendMessage("&#9436fe&lSHARDS &8| &cYou don't have enough money! You need $${convertCompact(cashPrice.toLong())}.".translate())
             return
         }
 
         VaultHook.withdraw(player, cashPrice)
         executeCommands(player, item)
-        player.sendMessage("&#9436fe&lSHARDS &8| &aSuccessfully purchased ${item.displayName}&a for $${String.format("%.2f", cashPrice)}!".translate())
+        player.sendMessage("&#9436fe&lSHARDS &8| &aSuccessfully purchased ${item.displayName}&a for $${convertCompact(cashPrice.toLong())}!".translate())
     }
 
     private fun executeCommands(player: Player, item: ShopItem) {
