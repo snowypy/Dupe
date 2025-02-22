@@ -24,6 +24,7 @@ import codes.snowy.dupeJS.missions.commands.MissionCommand;
 import codes.snowy.dupeJS.player.PlayerListener;
 import codes.snowy.dupeJS.player.PlayerManager;
 import codes.snowy.dupeJS.session.SessionListener;
+import codes.snowy.dupeJS.shards.AdminShardShopCommand;
 import codes.snowy.dupeJS.shards.ShardShopCommand;
 import codes.snowy.dupeJS.shards.ShardShopGUI;
 import codes.snowy.dupeJS.shards.ShardShopListener;
@@ -251,6 +252,8 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the RechargeAllDupe Command", "success");
         manager.registerCommand(new ForceResetMissionsCommand(missionManager));
         Logger.INSTANCE.log("Loaded the ForceResetMissions Command", "success");
+        manager.registerCommand(new AdminShardShopCommand());
+        Logger.INSTANCE.log("Loaded the AdminShardShop Command", "success");
 
         /*
         
