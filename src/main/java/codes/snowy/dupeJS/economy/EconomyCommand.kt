@@ -104,4 +104,47 @@ class EconomyCommand : BaseCommand() {
             sender.sendMessage("&#FF0000&lERROR &8| &fCouldn't take the money: $result".translate())
         }
     }
+
+    @Subcommand("set")
+    @Syntax("<player> <amount>")
+    @CommandCompletion("@players 1|10|100|1000|10000|100000|1000000|10000000|100000000|1000000000")
+    @Description("Set a player's balance")
+    fun setBalance(sender: CommandSender, playerName: String, amount: Double) {
+        val target = Bukkit.getPlayerExact(playerName)
+        if (target == null) {
+            sender.sendMessage("&#FF0000&lERROR &8| &fCouldn't find a player by the name &#ff0000&n$playerName".translate())
+            return
+        }
+
+        if (!VaultHook.hasEconomy()) {
+            sender.sendMessage("&#FF0000&lERROR &8| &fThere was an error with the Economy.".translate())
+            return
+        }
+
+        val oldbal = VaultHook.getBalance(target)
+        VaultHook.withdraw(target, oldbal)
+        VaultHook.deposit(target, amount)
+        sender.sendMessage("&#00FF00&lSUCCESS &8| &fSet ${target.name}'s balance to &#00FF00&n$${convertCompact(amount.toLong())}".translate())
+    }
+
+    @Subcommand("reset")
+    @Syntax("<player>")
+    @CommandCompletion("@players")
+    @Description("Reset a player's balance")
+    fun resetBalance(sender: CommandSender, playerName: String) {
+        val target = Bukkit.getPlayerExact(playerName)
+        if (target == null) {
+            sender.sendMessage("&#FF0000&lERROR &8| &fCouldn't find a player by the name &#ff0000&n$playerName".translate())
+            return
+        }
+
+        if (!VaultHook.hasEconomy()) {
+            sender.sendMessage("&#FF0000&lERROR &8| &fThere was an error with the Economy.".translate())
+            return
+        }
+        val oldbal = VaultHook.getBalance(target)
+        VaultHook.withdraw(target, oldbal)
+        sender.sendMessage("&#00FF00&lSUCCESS &8| &fReset ${target.name}'s balance.".translate())
+    }
+    
 } 
