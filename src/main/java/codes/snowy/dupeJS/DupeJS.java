@@ -38,10 +38,7 @@ import codes.snowy.dupeJS.tpa.TpaCancelCommand;
 import codes.snowy.dupeJS.tpa.TpaCommand;
 import codes.snowy.dupeJS.tpa.TpaDenyCommand;
 import codes.snowy.dupeJS.tpa.TpaHereCommand;
-import codes.snowy.dupeJS.utils.CommandCompletions;
-import codes.snowy.dupeJS.utils.Config;
-import codes.snowy.dupeJS.utils.Logger;
-import codes.snowy.dupeJS.utils.PlaceholderHandler;
+import codes.snowy.dupeJS.utils.*;
 import codes.snowy.dupeJS.bundles.AdminBundleCommand;
 import codes.snowy.dupeJS.bundles.BundleListener;
 import codes.snowy.dupeJS.bundles.BundleManager;
@@ -63,7 +60,6 @@ import codes.snowy.dupeJS.kits.KitGUI;
 import codes.snowy.dupeJS.kits.KitListener;
 import codes.snowy.dupeJS.kits.KitManager;
 import codes.snowy.dupeJS.teleporter.TeleportManager;
-import codes.snowy.dupeJS.utils.Language;
 import codes.snowy.dupeJS.staff.vanish.VanishCommand;
 import codes.snowy.dupeJS.afk.AFKRewardTask;
 import codes.snowy.dupeJS.kits.KitCooldownManager;
@@ -99,6 +95,7 @@ public final class DupeJS extends JavaPlugin {
     PlayerManager playerManager;
     private Config config;
     private Language language;
+    private DatabaseHelper dbHelper;
     private static DupeJS instance;
     KitManager kitManager;
     KitGUI kitGUI;
@@ -146,6 +143,7 @@ public final class DupeJS extends JavaPlugin {
         dupeManager = new DupeManager();
         lifestealmanager = new LifestealManager();
         crushPlusManager = new CrushPlusManager(this);
+        dbHelper = new DatabaseHelper();
         afkManager = new AFKManager();
         shardShopGUI = new ShardShopGUI(afkManager);
         kitManager = new KitManager();
@@ -316,7 +314,7 @@ public final class DupeJS extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new WarpGUIListener(warpManager, teleportManager), this);
         Logger.INSTANCE.log("Loaded the WarpGUI Listener", "success");
 
-        getServer().getPluginManager().registerEvents(new PlayerListener(playerManager), this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(playerManager, dbHelper), this);
         Logger.INSTANCE.log("Loaded the Player Listener", "success");
 
     }
