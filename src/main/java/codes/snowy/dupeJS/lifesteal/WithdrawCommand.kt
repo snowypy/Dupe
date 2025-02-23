@@ -12,6 +12,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 @CommandAlias("withdraw")
+@CommandPermission("dupe.withdraw")
 class WithdrawCommand(private val manager: LifestealManager) : BaseCommand() {
 
     @HelpCommand
