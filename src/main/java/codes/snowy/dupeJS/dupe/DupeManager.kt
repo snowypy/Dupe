@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack
 import java.util.*
 import kotlin.collections.HashMap
 import org.bukkit.scheduler.BukkitRunnable
+import java.util.concurrent.TimeUnit
 
 class DupeManager {
 
@@ -212,10 +213,8 @@ class DupeManager {
                 val hour = calendar.get(Calendar.HOUR_OF_DAY)
                 val minute = calendar.get(Calendar.MINUTE)
 
-                if (hour == 12 && minute == 0) {
-                    if (currentTime - lastResetTime >= 20 * 60 * 60 * 1000) {
-                        resetAllDupeCounts()
-                    }
+                if (hour == 12 && minute == 0 && currentTime - lastResetTime >= TimeUnit.HOURS.toMillis(1)) {
+                    resetAllDupeCounts()
                 }
             }
         }.runTaskTimer(DupeJS.getInstance(), 0L, 600L)
