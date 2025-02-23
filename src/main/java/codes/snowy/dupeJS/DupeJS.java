@@ -2,6 +2,7 @@ package codes.snowy.dupeJS;
 
 import co.aikar.commands.PaperCommandManager;
 import codes.snowy.dupeJS.adminutils.commands.AdminCommand;
+import codes.snowy.dupeJS.adminutils.commands.AnnounceCommand;
 import codes.snowy.dupeJS.adminutils.commands.HealCommand;
 import codes.snowy.dupeJS.afk.AFKAdminCommand;
 import codes.snowy.dupeJS.afk.AFKCommand;
@@ -71,6 +72,8 @@ import codes.snowy.dupeJS.warp.WarpManager;
 import codes.snowy.dupeJS.warp.WarpAdminCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.awt.event.ItemListener;
 import java.io.File;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -261,6 +264,10 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the AdminSave Command", "success");
         manager.registerCommand(new GiveCustomCommand(itemManager));
         Logger.INSTANCE.log("Loaded the GiveCustom Command", "success");
+        manager.registerCommand(new AnnounceCommand());
+        Logger.INSTANCE.log("Loaded the Announce Command", "success");
+        manager.registerCommand(new ShoutCommand());
+        Logger.INSTANCE.log("Loaded the Shout Command", "success");
 
         /*
         
@@ -316,6 +323,9 @@ public final class DupeJS extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new PlayerListener(playerManager, dbHelper), this);
         Logger.INSTANCE.log("Loaded the Player Listener", "success");
+
+        getServer().getPluginManager().registerEvents(new SpawnerShopListener(shardShopGUI), this);
+        Logger.INSTANCE.log("Loaded the SpawnerShop Listener", "success");
 
     }
 
