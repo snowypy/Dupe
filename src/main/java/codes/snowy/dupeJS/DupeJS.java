@@ -201,8 +201,6 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Lifesteal Admin Command", "success");
         manager.registerCommand(new PayHeartsCommand(lifestealmanager));
         Logger.INSTANCE.log("Loaded the PayHearts Command", "success");
-        manager.registerCommand(new WithdrawCommand(lifestealmanager));
-        Logger.INSTANCE.log("Loaded the Withdraw Command", "success");
         manager.registerCommand(new FlightCommand(crushPlusManager));
         Logger.INSTANCE.log("Loaded the Flight Command", "success");
         manager.registerCommand(new HomeCommand(homeManager, teleportManager, manager));
