@@ -34,6 +34,10 @@ import codes.snowy.dupeJS.staff.chat.StaffChatListener;
 import codes.snowy.dupeJS.staff.chat.StaffChatManager;
 import codes.snowy.dupeJS.staff.vanish.VanishListener;
 import codes.snowy.dupeJS.staff.vanish.VanishManager;
+import codes.snowy.dupeJS.teams.TeamListener;
+import codes.snowy.dupeJS.teams.TeamManager;
+import codes.snowy.dupeJS.teams.commands.TeamAdminCommand;
+import codes.snowy.dupeJS.teams.commands.TeamCommand;
 import codes.snowy.dupeJS.tpa.TpaAcceptCommand;
 import codes.snowy.dupeJS.tpa.TpaCancelCommand;
 import codes.snowy.dupeJS.tpa.TpaCommand;
@@ -81,6 +85,7 @@ import org.bukkit.plugin.ServicePriority;
 import codes.snowy.dupeJS.items.ItemManager;
 import codes.snowy.dupeJS.items.commands.AdminSaveCommand;
 import codes.snowy.dupeJS.items.commands.GiveCustomCommand;
+import codes.snowy.dupeJS.teams.TeamPvPListener;
 
 public final class DupeJS extends JavaPlugin {
 
@@ -110,7 +115,11 @@ public final class DupeJS extends JavaPlugin {
     CommandCompletions commandCompletions;
     WarpManager warpManager;
     WarpDatabase warpDatabase;
+    TeamManager teamManager;
     private ItemManager itemManager;
+    private TeamListener teamListener;
+    private TeamCommand teamCommand;
+    private TeamAdminCommand teamAdminCommand;
 
     public static DupeJS getInstance() {
         return instance;
@@ -161,13 +170,17 @@ public final class DupeJS extends JavaPlugin {
         WarpGUI warpGUI = new WarpGUI(warpManager, teleportManager);
         playerManager = new PlayerManager();
         itemManager = new ItemManager();
+        teamManager = new TeamManager();
+        teamListener = new TeamListener(teamManager);
+        teamCommand = new TeamCommand(teamManager, teamListener);
+        teamAdminCommand = new TeamAdminCommand(teamManager);
 
         PaperCommandManager manager = new PaperCommandManager(this);
         manager.enableUnstableAPI("help");
         Logger.INSTANCE.log("Loaded the Command Manager", "success");
 
         Logger.INSTANCE.log("Loaded Command Completions", "success");
-        commandCompletions = new CommandCompletions(kitManager, warpManager);
+        commandCompletions = new CommandCompletions(kitManager, warpManager, teamManager);
         commandCompletions.register(manager);
 
         // Injecting into Vault Economy
@@ -268,6 +281,10 @@ public final class DupeJS extends JavaPlugin {
         Logger.INSTANCE.log("Loaded the Announce Command", "success");
         manager.registerCommand(new ShoutCommand());
         Logger.INSTANCE.log("Loaded the Shout Command", "success");
+        manager.registerCommand(teamCommand);
+        Logger.INSTANCE.log("Loaded the Team Command", "success");
+        manager.registerCommand(teamAdminCommand);
+        Logger.INSTANCE.log("Loaded the TeamAdmin Command", "success");
 
         /*
         
@@ -326,6 +343,11 @@ public final class DupeJS extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new SpawnerShopListener(shardShopGUI), this);
         Logger.INSTANCE.log("Loaded the SpawnerShop Listener", "success");
+
+        getServer().getPluginManager().registerEvents(teamListener, this);
+        Logger.INSTANCE.log("Loaded the Team Listener", "success");
+
+        getServer().getPluginManager().registerEvents(new TeamPvPListener(teamManager), this);
 
     }
 
