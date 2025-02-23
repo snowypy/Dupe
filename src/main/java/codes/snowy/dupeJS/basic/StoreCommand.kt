@@ -25,7 +25,7 @@ class StoreCommand: BaseCommand() {
         sender.sendMessage("&c".translate())
 
         val discordLink = TextComponent("&7[Click to Open]".translate())
-        discordLink.clickEvent = ClickEvent(ClickEvent.Action.OPEN_URL, "https://store.dupeystealy.xyz")
+        discordLink.clickEvent = ClickEvent(ClickEvent.Action.RUN_COMMAND, "/buy")
         discordLink.hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText("&#bc28fd&nClick to visit!".translate()))
         sender.spigot().sendMessage(discordLink)
 
