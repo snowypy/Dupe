@@ -42,45 +42,45 @@ public class LifestealListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onHeartClaim(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        ItemStack itemInHand = player.getInventory().getItemInMainHand();
-
-        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
-            return;
-        }
-
-        if (itemInHand.getType() != Material.RED_DYE) {
-            return;
-        }
-
-        ItemMeta itemMeta = itemInHand.getItemMeta();
-        if (itemMeta == null || !itemMeta.hasDisplayName() ||
-                !itemMeta.getDisplayName().equals("§cHeart")) {
-            return;
-        }
-
-        if (!dupeManager.nbtCheck(itemInHand)) {
-            player.sendMessage(TranslationKt.translate("&#f6294b&lLIFESTEAL &8| &cThis item is not allowed to be used as a heart. Sorry!"));
-            return;
-        }
-
-        if (manager.getHearts(player) >= 50) {
-            player.sendMessage(TranslationKt.translate("&#f6294b&lLIFESTEAL &8| &cYou have reached the maximum amount of hearts"));
-            return;
-        }
-
-        if (manager.addHearts(player, 1)) {
-            player.sendMessage(TranslationKt.translate("&#f6294b&lLIFESTEAL &8| &cYou have claimed a heart"));
-            event.setCancelled(true);
-
-            int newAmount = itemInHand.getAmount() - 1;
-            if (newAmount <= 0) {
-                player.getInventory().setItemInMainHand(null);
-            } else {
-                itemInHand.setAmount(newAmount);
-            }
-        }
-    }
+    //@EventHandler
+    //public void onHeartClaim(PlayerInteractEvent event) {
+    //    Player player = event.getPlayer();
+    //    ItemStack itemInHand = player.getInventory().getItemInMainHand();
+//
+    //    if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
+    //        return;
+    //    }
+//
+    //    if (itemInHand.getType() != Material.RED_DYE) {
+    //        return;
+    //    }
+//
+    //    ItemMeta itemMeta = itemInHand.getItemMeta();
+    //    if (itemMeta == null || !itemMeta.hasDisplayName() ||
+    //            !itemMeta.getDisplayName().equals("§cHeart")) {
+    //        return;
+    //    }
+//
+    //    if (!dupeManager.nbtCheck(itemInHand)) {
+    //        player.sendMessage(TranslationKt.translate("&#f6294b&lLIFESTEAL &8| &cThis item is not allowed to be used as a heart. Sorry!"));
+    //        return;
+    //    }
+//
+    //    if (manager.getHearts(player) >= 50) {
+    //        player.sendMessage(TranslationKt.translate("&#f6294b&lLIFESTEAL &8| &cYou have reached the maximum amount of hearts"));
+    //        return;
+    //    }
+//
+    //    if (manager.addHearts(player, 1)) {
+    //        player.sendMessage(TranslationKt.translate("&#f6294b&lLIFESTEAL &8| &cYou have claimed a heart"));
+    //        event.setCancelled(true);
+//
+    //        int newAmount = itemInHand.getAmount() - 1;
+    //        if (newAmount <= 0) {
+    //            player.getInventory().setItemInMainHand(null);
+    //        } else {
+    //            itemInHand.setAmount(newAmount);
+    //        }
+    //    }
+    //}
 }
