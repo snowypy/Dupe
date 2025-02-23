@@ -24,44 +24,50 @@ class KitGUI(
         val startSlot = (kitSlots.size - (totalKits * 2 - 1)) / 2
 
         kits.forEachIndexed { index, kit ->
-            if (player.hasPermission(kit.permission)) {
-                val canUse = cooldownManager.canUseKit(player.uniqueId, kit)
-                val displayName = if (!canUse) {
-                    "&#ff0000&l${kit.name}".toUpperCase().translate()
-                } else {
-                    "&#feda36&l${kit.name}".toUpperCase().translate()
-                }
-
-                val lore = if (!canUse) {
-                    val remaining = cooldownManager.getRemainingCooldown(player.uniqueId, kit)
-                    val hours = remaining / (1000 * 60 * 60)
-                    val minutes = (remaining % (1000 * 60 * 60)) / (1000 * 60)
-                    val timesClaimed = cooldownManager.getTimesClaimed(player.uniqueId, kit.name)
-                    listOf(
-                        "",
-                        "&#feda36&l| &7Cooldown: &#FF0000${hours}h ${minutes}m".translate(),
-                        "&#feda36&l| &7Times Claimed: $timesClaimed".translate(),
-                        "",
-                        "&#ff0000[On Cooldown]".translate()
-                    )
-                } else {
-                    val timesClaimed = cooldownManager.getTimesClaimed(player.uniqueId, kit.name)
-                    listOf(
-                        "",
-                        "&#feda36&l| &7Times Claimed: $timesClaimed".translate(),
-                        "",
-                        "&#10f08a[Click to Claim]".translate()
-                    )
-                }
-
-                val displayItem = ItemStack(Material.valueOf(if (!canUse) "CLOCK" else kit.displayItem)).apply {
-                    itemMeta = itemMeta?.apply {
-                        setDisplayName(displayName)
-                        this.lore = lore
-                    }
-                }
-                inventory.setItem(kitSlots[startSlot + index * 2], displayItem)
+            val displayName = if (!player.hasPermission(kit.permission)) {
+                "&#ff0000&l${kit.name}".toUpperCase().translate()
+            } else if (!cooldownManager.canUseKit(player.uniqueId, kit)) {
+                "&#ff0000&l${kit.name}".toUpperCase().translate()
+            } else {
+                "&#feda36&l${kit.name}".toUpperCase().translate()
             }
+            val timesClaimed = cooldownManager.getTimesClaimed(player.uniqueId, kit.name)
+
+            val lore = if (!player.hasPermission(kit.permission)) {
+                listOf(
+                    "",
+                    "&#feda36&l| &7Times Claimed: $timesClaimed".translate(),
+                    "",
+                    "&#ff0000[No Permission]".translate()
+                )
+            } else if (!cooldownManager.canUseKit(player.uniqueId, kit)) {
+                val remaining = cooldownManager.getRemainingCooldown(player.uniqueId, kit)
+                val hours = remaining / (1000 * 60 * 60)
+                val minutes = (remaining % (1000 * 60 * 60)) / (1000 * 60)
+                listOf(
+                    "",
+                    "&#feda36&l| &7Cooldown: &#FF0000${hours}h ${minutes}m".translate(),
+                    "&#feda36&l| &7Times Claimed: $timesClaimed".translate(),
+                    "",
+                    "&#ff0000[On Cooldown]".translate()
+                )
+            } else {
+                val timesClaimed = cooldownManager.getTimesClaimed(player.uniqueId, kit.name)
+                listOf(
+                    "",
+                    "&#feda36&l| &7Times Claimed: $timesClaimed".translate(),
+                    "",
+                    "&#10f08a[Click to Claim]".translate()
+                )
+            }
+
+            val displayItem = ItemStack(Material.valueOf(if (!cooldownManager.canUseKit(player.uniqueId, kit) || !player.hasPermission(kit.permission)) "CLOCK" else kit.displayItem)).apply {
+                itemMeta = itemMeta?.apply {
+                    setDisplayName(displayName)
+                    this.lore = lore
+                }
+            }
+            inventory.setItem(kitSlots[startSlot + index * 2], displayItem)
         }
 
         for (i in 0 until inventory.size) {
