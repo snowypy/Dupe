@@ -13,6 +13,7 @@ import java.sql.ResultSet
 import java.util.UUID
 import formatMaterial
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.*
@@ -108,6 +109,14 @@ class DupeManager {
 
         if (nbtCheck(item)) {
             player.sendMessage("&#ff3358&lDUPE &8| &#ff0000&nHey!&r &fYou are trying to dupe a &#ff0000&nBLACKLISTED&f item.".translate())
+            return
+        }
+
+        if (item.type == Material.SPAWNER) {
+            player.sendMessage("&#ff3358&lDUPE &8| &#ff0000&nHey!&r &fYou cannot dupe spawners.".translate())
+            return
+        } else if (item.type == Material.ENCHANTED_GOLDEN_APPLE) {
+            player.sendMessage("&#ff3358&lDUPE &8| &#ff0000&nHey!&r &fYou cannot dupe enchanted golden apples.".translate())
             return
         }
 
