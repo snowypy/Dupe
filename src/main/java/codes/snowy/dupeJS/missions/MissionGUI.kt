@@ -51,6 +51,16 @@ class MissionGUI(private val missionManager: MissionManager, private val rewardS
 
         missions.forEachIndexed { index, mission ->
             val isComplete = mission.progress >= mission.target
+            val displayProgress = if (mission.missionType == "Play for Hours") {
+                mission.progress / 60
+            } else {
+                mission.progress
+            }
+            val displayTarget = if (mission.missionType == "Play for Hours") {
+                mission.target / 60
+            } else {
+                mission.target
+            }
             val statusColor = when {
                 mission.claimed -> "&#ff0000&n"
                 isComplete -> "&#5fff33&n"
@@ -69,7 +79,7 @@ class MissionGUI(private val missionManager: MissionManager, private val rewardS
                     setDisplayName("$statusColor${mission.type}&r $frequencyColor$frequencyText".translate())
                     lore = listOf(
                         "",
-                        "$frequencyColor&l| &fProgress: ${mission.progress}/${mission.target}".translate(),
+                        "$frequencyColor&l| &fProgress: $displayProgress/$displayTarget".translate(),
                         "$frequencyColor&l| &fLast Updated: ${formatTimeSince(mission.lastUpdated)}".translate(),
                         "$frequencyColor&l| &fTime Left: ${mission.timeLeft()}".translate(),
                         "",
