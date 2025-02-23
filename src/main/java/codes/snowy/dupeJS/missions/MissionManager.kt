@@ -57,40 +57,54 @@ class MissionManager(private val db: MissionDatabase) {
         object : BukkitRunnable() {
             override fun run() {
                 val currentTime = System.currentTimeMillis()
+                val oneDayInMillis = TimeUnit.DAYS.toMillis(1)
+                val sevenDaysInMillis = TimeUnit.DAYS.toMillis(7)
 
-                if (currentTime - lastDailyReset >= TimeUnit.DAYS.toMillis(1)) {
+                if (currentTime - lastDailyReset >= oneDayInMillis) {
+
+                    val daysToSkip = ((currentTime - lastDailyReset) / oneDayInMillis).toInt()
+                    lastDailyReset += (oneDayInMillis * daysToSkip)
                     resetDailyMissions()
-                    lastDailyReset = currentTime
                     saveCooldowns()
                 }
 
-                if (currentTime - lastWeeklyReset >= TimeUnit.DAYS.toMillis(7)) {
+                if (currentTime - lastWeeklyReset >= sevenDaysInMillis) {
+
+                    val weeksToSkip = ((currentTime - lastWeeklyReset) / sevenDaysInMillis).toInt()
+                    lastWeeklyReset += (sevenDaysInMillis * weeksToSkip)
                     resetWeeklyMissions()
-                    lastWeeklyReset = currentTime
                     saveCooldowns()
                 }
             }
-        }.runTaskTimer(DupeJS.getInstance(), 0L, 72000L)
+        }.runTaskTimer(DupeJS.getInstance(), 20L, 1200L)
     }
 
-    private fun resetDailyMissions() {
+    fun resetDailyMissions() {
         val playerUUIDs = getAllPlayerUUIDs()
+        val onlinePlayers = Bukkit.getOnlinePlayers().map { it.uniqueId }.toSet()
+        
         playerUUIDs.forEach { playerUUID ->
             val player = Bukkit.getPlayer(playerUUID)
-            clearPlayerMissions(player ?: return)
-            assignMissions(player, 3, "daily")
-            player?.sendMessage("&#feda36&lMISSIONS &8| &fYour daily missions have been reset!".translate())
+            if (player != null) {
+                clearPlayerMissions(player, "daily")
+                assignMissions(player, 2, "daily")
+            }
         }
+        Bukkit.broadcastMessage("&#feda36&lMISSIONS &8| &fYour daily missions have been reset!".translate())
     }
 
-    private fun resetWeeklyMissions() {
+    fun resetWeeklyMissions() {
         val playerUUIDs = getAllPlayerUUIDs()
+        val onlinePlayers = Bukkit.getOnlinePlayers().map { it.uniqueId }.toSet()
+        
         playerUUIDs.forEach { playerUUID ->
             val player = Bukkit.getPlayer(playerUUID)
-            clearPlayerMissions(player ?: return)
-            assignMissions(player, 2, "weekly")
-            player?.sendMessage("&#feda36&lMISSIONS &8| &fYour weekly missions have been reset!".translate())
+            if (player != null) {
+                clearPlayerMissions(player, "weekly")
+                assignMissions(player, 3, "weekly")
+            }
         }
+        Bukkit.broadcastMessage("&#feda36&lMISSIONS &8| &fYour weekly missions have been reset!".translate())
     }
 
     fun getAllPlayerUUIDs(): List<UUID> {
@@ -156,7 +170,11 @@ class MissionManager(private val db: MissionDatabase) {
 
         missions.forEach { (missionDescription, baseMissionType) ->
             val missionUUID = UUID.randomUUID().toString()
-            val target = extractTarget(missionDescription)
+            val target = if (baseMissionType == "Play for Hours") {
+                extractTarget(missionDescription) * 60
+            } else {
+                extractTarget(missionDescription)
+            }
             val statement: PreparedStatement = dbConnection.prepareStatement("""
                 INSERT OR REPLACE INTO player_missions (player_uuid, mission_uuid, mission_type, progress, target, last_updated, claimed, frequency)
                 VALUES (?, ?, ?, 0, ?, ?, 0, ?)
@@ -174,7 +192,6 @@ class MissionManager(private val db: MissionDatabase) {
 
     fun updateMissionProgress(player: Player, missionType: String, progress: Int) {
         val playerUUID = player.uniqueId
-        Bukkit.getLogger().info("Updating mission progress for player: ${player.name}, missionType: $missionType, progress: $progress")
 
         val selectStatement: PreparedStatement = dbConnection.prepareStatement("""
             SELECT mission_uuid, progress, target FROM player_missions
@@ -317,12 +334,19 @@ class MissionManager(private val db: MissionDatabase) {
         }
     }
 
-    fun clearPlayerMissions(player: Player) {
+    fun clearPlayerMissions(player: Player, frequency: String? = null) {
         val playerUUID = player.uniqueId
-        val statement: PreparedStatement = dbConnection.prepareStatement("""
-            DELETE FROM player_missions WHERE player_uuid = ?
-        """)
+        val sql = if (frequency != null) {
+            "DELETE FROM player_missions WHERE player_uuid = ? AND frequency = ?"
+        } else {
+            "DELETE FROM player_missions WHERE player_uuid = ?"
+        }
+        
+        val statement: PreparedStatement = dbConnection.prepareStatement(sql)
         statement.setString(1, playerUUID.toString())
+        if (frequency != null) {
+            statement.setString(2, frequency)
+        }
         statement.executeUpdate()
         statement.close()
     }
