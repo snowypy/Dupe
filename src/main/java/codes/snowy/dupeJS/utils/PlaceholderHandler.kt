@@ -5,6 +5,7 @@ import codes.snowy.dupeJS.afk.AFKManager
 import codes.snowy.dupeJS.dupe.DupeManager
 import codes.snowy.dupeJS.economy.VaultHook
 import codes.snowy.dupeJS.player.PlayerManager
+import codes.snowy.dupeJS.teams.TeamManager
 import codes.snowy.dupeJS.utils.NumberConverter.convertCompact
 import me.clip.placeholderapi.expansion.PlaceholderExpansion
 import org.bukkit.entity.Player
@@ -14,6 +15,7 @@ class PlaceholderHandler(plugin: DupeJS) : PlaceholderExpansion() {
     private val dupeManager = DupeManager()
     private val afkManager = AFKManager()
     private val playerManager = PlayerManager()
+    private val teamManager = TeamManager()
 
     override fun getAuthor(): String {
         return "snowy"
@@ -60,6 +62,21 @@ class PlaceholderHandler(plugin: DupeJS) : PlaceholderExpansion() {
         } else if (params.equals("kills", ignoreCase = true)) {
             val kills = playerManager.getKills(player.uniqueId)
             return kills.toString()
+        } else if (params.equals("team_name", ignoreCase = true)) {
+            return teamManager.getPlayerTeam(player.name)?.name ?: "None"
+        } else if (params.equals("team_name_upper", ignoreCase = true)) {
+            return teamManager.getPlayerTeam(player.name)?.name?.toUpperCase() ?: ""
+        } else if (params.equals("team_tag", ignoreCase = true)) {
+            return teamManager.getPlayerTeam(player.name)?.tag ?: "None"
+        } else if (params.equals("team_tag_upper", ignoreCase = true)) {
+            return teamManager.getPlayerTeam(player.name)?.tag?.toUpperCase() ?: ""
+        } else if (params.equals("team_role", ignoreCase = true)) {
+            val team = teamManager.getPlayerTeam(player.name)
+            return when {
+                team == null -> "None"
+                team.owner == player.name -> "Owner"
+                else -> "Member"
+            }
         }
         return "&cInvalid placeholder.".translate()
     }
