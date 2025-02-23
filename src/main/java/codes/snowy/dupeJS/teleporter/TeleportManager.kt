@@ -23,6 +23,14 @@ class TeleportManager(private val plugin: JavaPlugin) {
         val countdownSeconds = 5
 
         player.playSound(player.location, "block.note_block.pling", 1f, 1f)
+
+        if (player.hasPermission(config.getValue("permissions.teleport.bypass").toString())) {
+            player.teleport(location)
+            player.playSound(player.location, "entity.enderman.teleport", 1f, 1f)
+            player.sendMessage("&#10f08a&lTELEPORTER &8| &#c4f5dfYou have been teleported to \"$name\"! &7[COOLDOWN BYPASS]".translate())
+            return
+        }
+
         player.sendMessage("&#10f08a&lTELEPORTER &8| &#c4f5dfYou will be teleported to \"$name\" in $countdownSeconds seconds...".translate())
 
         object : BukkitRunnable() {
