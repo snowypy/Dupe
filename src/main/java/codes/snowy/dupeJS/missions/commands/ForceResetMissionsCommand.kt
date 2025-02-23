@@ -22,17 +22,8 @@ class ForceResetMissionsCommand(private val missionManager: MissionManager) : Ba
     @Description("Force reset all players' missions")
     fun onResetAll(sender: CommandSender) {
         if (sender.hasPermission("dupe.admin")) {
-            val playerUUIDs = missionManager.getAllPlayerUUIDs()
-            playerUUIDs.forEach { playerUUID ->
-                val player = Bukkit.getPlayer(playerUUID)
-                missionManager.clearPlayerMissions(player ?: return)
-                missionManager.assignMissions(player, 2, "daily")
-                missionManager.assignMissions(player, 3, "weekly")
-                if (player != null && !notifiedPlayers.contains(playerUUID)) {
-                    player.sendMessage("&#feda36&lMISSIONS &8| &fYour missions have been forcefully reset by an admin!".translate())
-                    notifiedPlayers.add(playerUUID)
-                }
-            }
+            missionManager.resetDailyMissions()
+            missionManager.resetWeeklyMissions()
             sender.sendMessage("&#feda36&lMISSIONS &8| &fAll players' missions have been reset.".translate())
             notifiedPlayers.clear()
         } else {
