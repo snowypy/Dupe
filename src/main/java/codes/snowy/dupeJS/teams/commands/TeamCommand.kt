@@ -9,6 +9,7 @@ import codes.snowy.dupeJS.teams.TeamManager
 import codes.snowy.dupeJS.teams.TeamListener
 import codes.snowy.dupeJS.utils.translate
 import org.bukkit.Bukkit
+import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 
@@ -91,7 +92,8 @@ class TeamCommand(
             return
         }
 
-        val chatFormat = "&8[&b${team.tag}&8] &7${player.name}&f: $message"
+        val messageFinal = ChatColor.stripColor(message)
+        val chatFormat = "&b&lTEAM CHAT &8| &f${player.name}&f: &7$messageFinal"
         team.members.forEach { member ->
             Bukkit.getPlayer(member)?.sendMessage(chatFormat.translate())
         }
@@ -121,8 +123,8 @@ class TeamCommand(
         }
 
         if (teamManager.toggleTeamPvp(team.name, player.name, allow)) {
-            val status = if (allow) "enabled" else "disabled"
-            player.sendMessage("&#00FF00&lTEAMS &8| &fTeam PvP has been $status.".translate())
+            val status = if (allow) "&a&nenabled" else "&c&ndisabled"
+            player.sendMessage("&#00FF00&lTEAMS &8| &fTeam PvP has been $status&f.".translate())
         }
     }
 
@@ -137,11 +139,11 @@ class TeamCommand(
 
         sender.sendMessage("""
             &#00FF00&lTEAM INFO
-            &8&l» &fName: &a${team.name}
-            &8&l» &fTag: &b${team.tag}
-            &8&l» &fOwner: &a${team.owner}
-            &8&l» &fMembers &7(${team.members.size})&f: &a${team.members.joinToString("&f, &a")}
-            &8&l» &fPvP: ${if (team.allowTeamPvp) "&aEnabled" else "&cDisabled"}
+            &8&l| &fName: &a${team.name}
+            &8&l| &fTag: &b${team.tag}
+            &8&l| &fOwner: &a${team.owner}
+            &8&l| &fMembers &7(${team.members.size})&f: &a${team.members.joinToString("&f, &a")}
+            &8&l| &fPvP: ${if (team.allowTeamPvp) "&aEnabled" else "&cDisabled"}
         """.trimIndent().translate())
     }
 
@@ -156,10 +158,10 @@ class TeamCommand(
 
         sender.sendMessage("""
             &#00FF00&lPLAYER TEAM INFO
-            &8&l» &fPlayer: &a$playerName
-            &8&l» &fTeam: &a${team.name}
-            &8&l» &fTag: &b${team.tag}
-            &8&l» &fRole: ${if (team.owner == playerName) "&6Owner" else "&7Member"}
+            &8&l| &fPlayer: &a$playerName
+            &8&l| &fTeam: &a${team.name}
+            &8&l| &fTag: &b${team.tag}
+            &8&l| &fRole: ${if (team.owner == playerName) "&6Owner" else "&7Member"}
         """.trimIndent().translate())
     }
 
@@ -244,11 +246,11 @@ class TeamCommand(
 
         sender.sendMessage("""
             &#00FF00&lTEAM MEMBERS &7(${team.members.size} members)
-            &8&l» &fTeam: &a${team.name}
-            &8&l» &fTag: &b${team.tag}
-            &8&l» &fOwner: &6${team.owner}
-            &8&l» &fMembers: &a${team.members.joinToString("&f, &a")}
-            &8&l» &fPvP: ${if (team.allowTeamPvp) "&aEnabled" else "&cDisabled"}
+            &8&l| &fTeam: &a${team.name}
+            &8&l| &fTag: &b${team.tag}
+            &8&l| &fOwner: &6${team.owner}
+            &8&l| &fMembers: &a${team.members.joinToString("&f, &a")}
+            &8&l| &fPvP: ${if (team.allowTeamPvp) "&aEnabled" else "&cDisabled"}
         """.trimIndent().translate())
     }
 } 
